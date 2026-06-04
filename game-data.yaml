@@ -11,8 +11,8 @@ spaces:
     type: quiz
     label: "Apakah jenis garisan dalam gambar?"
     points: 1
-    choices: "Silang pangkah|Lurus|Beralun|Pecah"
-    answer: 1
+    choices: "Silang pangkah|Lurus|Beralun|Berpancar"
+    answer: 2
   2:
     type: quiz
     label: "Unsur seni manakah paling menonjol?"
@@ -63,7 +63,7 @@ spaces:
     label: "Apakah objek yang paling menarik perhatian?"
     points: 1
     choices: "Payung hitam|Payung warna-warni|Hujan|Jalan raya"
-    answer: 1
+    answer: 2
   11:
     type: drawing
     label: "LUKISKAN BUNGA YANG SUSUNAN SEIMBANG"
@@ -73,7 +73,7 @@ spaces:
     label: "Adakah gambar ini seimbang?"
     points: 1
     choices: "Ya|Tidak|Mungkin|Kurang pasti"
-    answer: 1
+    answer: 2
   13:
     type: drawing
     label: "LUKISKAN CORAK BERULANG"
@@ -184,7 +184,7 @@ spaces:
     type: quiz
     label: "Apakah maksud harmoni?"
     points: 5
-    choices: "Sesuatu yang bercanggah|Keadaan yang aman, teratur dan selesa|Susunan yang berserabut|Fokus utama karya"
+    choices: "Sesuatu yang bercanggah dan sama|susunan,ulangan atau gabungan unsur-unsur seni yang melengkapi|Susunan yang berserabut|Fokus utama karya"
     answer: 2
   33:
     type: quiz
