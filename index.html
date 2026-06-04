@@ -16,12 +16,67 @@
   .cell-hit{position:absolute;cursor:pointer;border-radius:3px;transition:background 0.15s}
   .cell-hit:hover{background:rgba(255,215,0,0.35);outline:2px solid gold}
   .cell-hit.highlight{background:rgba(255,215,0,0.5);outline:2px solid gold}
+  
+  .cell-flash { animation: cellFlash 0.6s ease-in-out 2; }
+  @keyframes cellFlash {
+    0% { background: rgba(255,215,0,0); outline: none; }
+    30% { background: rgba(255,215,0,0.8); outline: 3px solid gold; }
+    70% { background: rgba(255,215,0,0.8); outline: 3px solid gold; }
+    100% { background: rgba(255,215,0,0); outline: none; }
+  }
 
-  .ptoken{position:absolute;width:4.5%;height:4.5%;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:clamp(12px,2vw,22px);border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,0.6);transition:left 0.5s ease,top 0.5s ease;z-index:20;pointer-events:none;transform:translate(-50%,-50%)}
+  .ptoken {
+    position: absolute;
+    width: 4.5%;
+    height: 4.5%;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(12px,2vw,22px);
+    border: 2px solid #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+    transition: left 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.2), top 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.2);
+    z-index: 20;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    will-change: left, top;
+  }
+  .ptoken.bounce { animation: tokenBounce 0.2s ease-out; }
+  @keyframes tokenBounce {
+    0% { transform: translate(-50%, -50%) scale(1); }
+    50% { transform: translate(-50%, -50%) scale(1.2); }
+    100% { transform: translate(-50%, -50%) scale(1); }
+  }
+
+  /* Subtle but visible active token glow - toned down */
+  .ptoken.token-active {
+    animation: gentlePulse 1.5s ease-in-out infinite;
+    box-shadow: 0 0 0 3px rgba(244,168,32,0.5), 0 0 0 6px rgba(244,168,32,0.2), 0 2px 8px rgba(0,0,0,0.6);
+    border: 2px solid #F4A820;
+    filter: drop-shadow(0 0 3px rgba(244,168,32,0.5));
+    z-index: 25;
+  }
+  @keyframes gentlePulse {
+    0% {
+      box-shadow: 0 0 0 3px rgba(244,168,32,0.5), 0 0 0 6px rgba(244,168,32,0.2);
+      filter: drop-shadow(0 0 2px rgba(244,168,32,0.4));
+      transform: translate(-50%, -50%) scale(1);
+    }
+    50% {
+      box-shadow: 0 0 0 5px rgba(244,168,32,0.7), 0 0 0 10px rgba(244,168,32,0.3);
+      filter: drop-shadow(0 0 5px rgba(244,168,32,0.6));
+      transform: translate(-50%, -50%) scale(1.02);
+    }
+    100% {
+      box-shadow: 0 0 0 3px rgba(244,168,32,0.5), 0 0 0 6px rgba(244,168,32,0.2);
+      filter: drop-shadow(0 0 2px rgba(244,168,32,0.4));
+      transform: translate(-50%, -50%) scale(1);
+    }
+  }
 
   #controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center}
   
-  /* DICE STYLES - with smooth transitions */
   #dice-display {
     width: 70px;
     height: 70px;
@@ -32,7 +87,6 @@
     align-items: center;
     justify-content: center;
     margin: 0 8px;
-    transition: transform 0.1s ease;
   }
   .die {
     width: 100%;
@@ -42,23 +96,16 @@
     grid-template-rows: repeat(3, 1fr);
     gap: 4px;
     padding: 8px;
-    transition: all 0.05s linear;
   }
   .dot {
     background-color: #e0e0e0;
     border-radius: 50%;
     width: 100%;
     height: 100%;
-    align-self: center;
-    justify-self: center;
     transition: background-color 0.05s;
   }
-  .dot.lit {
-    background-color: #1a1a2e;
-    box-shadow: inset 0 1px 2px rgba(0,0,0,0.2);
-  }
+  .dot.lit { background-color: #1a1a2e; box-shadow: inset 0 1px 2px rgba(0,0,0,0.2); }
   
-  /* Rolling animation keyframes */
   @keyframes rollShake {
     0% { transform: rotate(0deg) scale(1); }
     15% { transform: rotate(15deg) scale(1.1); }
@@ -67,9 +114,7 @@
     70% { transform: rotate(-5deg) scale(1.1); }
     100% { transform: rotate(0deg) scale(1); }
   }
-  .rolling {
-    animation: rollShake 0.5s cubic-bezier(0.25, 1.5, 0.5, 1);
-  }
+  .rolling { animation: rollShake 0.5s cubic-bezier(0.25, 1.5, 0.5, 1); }
 
   button{font-size:13px;padding:8px 18px;border-radius:8px;border:1.5px solid #F4A820;background:#1a1a2e;color:#F4A820;cursor:pointer;font-weight:600;transition:all 0.15s}
   button:hover{background:#F4A820;color:#1a1a2e}
@@ -108,7 +153,6 @@
   #turn-label{color:#F4A820;font-size:13px;font-weight:600}
   .loading{text-align:center;color:#F4A820;padding:20px}
 
-  /* Result reveal animation */
   .result-overlay {
     position: fixed;
     top: 50%;
@@ -174,7 +218,6 @@
       </div>
     </div>
     <button id="roll-btn">Buang Dadu</button>
-    <button id="end-btn" style="display:none">Tamat Giliran</button>
     <span id="turn-label"></span>
   </div>
   <div id="log-wrap"><div id="log"></div></div>
@@ -195,62 +238,79 @@
 </div>
 
 <script>
-// Global variables
 let SPACE_POS = [];
 let SPACES = [];
 let QUIZ_BANK = {};
 let players = [], currentPlayer = 0, rolled = false;
+let isMoving = false;
 const COLORS = ['#E74C3C','#3498DB','#2ECC71','#9B59B6'];
 const EMOJIS = ['🎨','🖌️','✏️','🖼️'];
 
-// Die dot patterns (1-indexed positions, 1-9)
-const DIE_PATTERNS = {
-  1: [5],
-  2: [3, 7],
-  3: [3, 5, 7],
-  4: [1, 3, 7, 9],
-  5: [1, 3, 5, 7, 9],
-  6: [1, 3, 4, 6, 7, 9]
-};
+const DIE_PATTERNS = { 1:[5], 2:[3,7], 3:[3,5,7], 4:[1,3,7,9], 5:[1,3,5,7,9], 6:[1,3,4,6,7,9] };
 
 function updateDieFace(value) {
   const dots = document.querySelectorAll('#die .dot');
   dots.forEach(dot => dot.classList.remove('lit'));
   const positions = DIE_PATTERNS[value];
-  if (positions) {
-    positions.forEach(pos => {
-      if (dots[pos-1]) dots[pos-1].classList.add('lit');
-    });
-  }
+  if (positions) positions.forEach(pos => { if (dots[pos-1]) dots[pos-1].classList.add('lit'); });
 }
 
-// Animated roll: rapidly change faces, then final number
 async function animateRoll(finalValue) {
   const rollBtn = document.getElementById('roll-btn');
   rollBtn.disabled = true;
   const diceContainer = document.getElementById('dice-display');
   diceContainer.classList.add('rolling');
-  
-  // Number of face changes during animation (16 changes over ~0.5 seconds)
   const steps = 16;
-  const interval = 25; // ms
+  const interval = 25;
   for (let i = 0; i <= steps; i++) {
-    if (i === steps) {
-      // Final face
-      updateDieFace(finalValue);
-    } else {
-      // Random face between 1-6
-      const randomFace = Math.floor(Math.random() * 6) + 1;
-      updateDieFace(randomFace);
-    }
+    if (i === steps) updateDieFace(finalValue);
+    else updateDieFace(Math.floor(Math.random() * 6) + 1);
     await new Promise(r => setTimeout(r, interval));
   }
-  
-  // Remove animation class after a short delay
   setTimeout(() => {
     diceContainer.classList.remove('rolling');
     rollBtn.disabled = false;
   }, 100);
+}
+
+function addBounceToToken(playerIndex) {
+  const tokens = document.querySelectorAll('#tokens-layer .ptoken');
+  if (tokens[playerIndex]) {
+    tokens[playerIndex].classList.add('bounce');
+    setTimeout(() => tokens[playerIndex].classList.remove('bounce'), 200);
+  }
+}
+
+async function animateStepwise(player, steps) {
+  let currentPos = player.pos;
+  for (let step = 1; step <= steps; step++) {
+    let nextPos = (currentPos + 1) % SPACES.length;
+    if (nextPos < currentPos && currentPos !== 0) {
+      player.score += 5;
+      addLog(`${player.emoji} Melepasi petak MULA! +5 mata`);
+    }
+    player.pos = nextPos;
+    renderTokens();
+    addBounceToToken(players.indexOf(player));
+    highlightCell(nextPos);
+    await new Promise(r => setTimeout(r, 250));
+    currentPos = nextPos;
+  }
+  clearHighlight();
+  renderPlayers();
+  return currentPos;
+}
+
+function flashCell(cellId) {
+  return new Promise((resolve) => {
+    const cell = document.getElementById(cellId);
+    if (!cell) { resolve(); return; }
+    cell.classList.add('cell-flash');
+    setTimeout(() => {
+      cell.classList.remove('cell-flash');
+      resolve();
+    }, 650);
+  });
 }
 
 function buildNameInputs() {
@@ -258,7 +318,6 @@ function buildNameInputs() {
   if (!numSelect) return;
   const n = parseInt(numSelect.value);
   const container = document.getElementById('name-inputs');
-  if (!container) return;
   container.innerHTML = '';
   for (let i = 0; i < n; i++) {
     container.innerHTML += `<div class="setup-row"><label>${EMOJIS[i]} Pemain ${i+1}:</label><input id="pname${i}" type="text" value="Pemain ${i+1}"></div>`;
@@ -275,20 +334,16 @@ async function loadGameData() {
     SPACES = data.board_spaces;
     QUIZ_BANK = data.quiz_bank;
     if (!SPACE_POS || !SPACES || !QUIZ_BANK) throw new Error('Data YAML tidak lengkap');
-    
     document.getElementById('loading-message').style.display = 'none';
-    const setupDiv = document.getElementById('setup');
-    setupDiv.style.display = 'block';
+    document.getElementById('setup').style.display = 'block';
     buildNameInputs();
   } catch (err) {
     document.getElementById('loading-message').innerHTML = `❌ Ralat: ${err.message}<br>Pastikan fail <strong>game-data.yaml</strong> berada di folder yang sama.`;
-    console.error(err);
   }
 }
 
 function startGame() {
   const numSelect = document.getElementById('num-players');
-  if (!numSelect) return;
   const n = parseInt(numSelect.value);
   players = [];
   for (let i = 0; i < n; i++) {
@@ -297,16 +352,16 @@ function startGame() {
     players.push({name, pos: 0, score: 0, color: COLORS[i], emoji: EMOJIS[i], jailed: false});
   }
   document.getElementById('setup').style.display = 'none';
-  const gameArea = document.getElementById('game-area');
-  gameArea.style.display = 'flex';
+  document.getElementById('game-area').style.display = 'flex';
   buildCells();
   renderTokens();
   renderPlayers();
   updateTurnLabel();
   addLog("🎉 Permainan bermula! Giliran pertama.");
   rolled = false;
-  document.getElementById('end-btn').style.display = 'none';
+  isMoving = false;
   updateDieFace(1);
+  updateActiveToken();
 }
 
 function buildCells() {
@@ -330,8 +385,7 @@ function buildCells() {
 
 function onCellClick(idx) {
   const sp = SPACES[idx];
-  if (!sp) return;
-  showModal('INFO Ruang ' + idx, sp.label || 'Tiada keterangan', [{label:'Tutup', fn: closeModal}]);
+  if (sp) showModal('INFO Ruang ' + idx, sp.label || 'Tiada keterangan', [{label:'Tutup', fn: closeModal}]);
 }
 
 function playBeep(isCorrect) {
@@ -347,16 +401,15 @@ function playBeep(isCorrect) {
     oscillator.start();
     gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.5);
     oscillator.stop(audioCtx.currentTime + 0.5);
-    audioCtx.resume().catch(e => console.log("Audio not allowed"));
-  } catch(e) { /* silent fallback */ }
+    audioCtx.resume().catch(e => {});
+  } catch(e) {}
 }
 
-function showResult(isCorrect, pointsEarned, correctAnswerLetter, correctAnswerText) {
+function showResult(isCorrect, pointsEarned, correctAnswerLetter, correctAnswerText, onClose) {
   const overlay = document.getElementById('result-overlay');
   const emojiSpan = document.getElementById('result-emoji');
   const textDiv = document.getElementById('result-text');
   const pointsDiv = document.getElementById('result-points');
-  
   if (isCorrect) {
     overlay.classList.add('result-correct');
     overlay.classList.remove('result-wrong');
@@ -370,13 +423,15 @@ function showResult(isCorrect, pointsEarned, correctAnswerLetter, correctAnswerT
     textDiv.textContent = `SALAH!`;
     pointsDiv.textContent = `Jawapan betul: ${correctAnswerLetter}. ${correctAnswerText}`;
   }
-  
   overlay.classList.add('show');
-  setTimeout(() => overlay.classList.remove('show'), 1800);
+  setTimeout(() => {
+    overlay.classList.remove('show');
+    if (onClose) onClose();
+  }, 1800);
 }
 
 async function rollDice() {
-  if (rolled) { addLog("⏳ Anda sudah buang dadu! Selesaikan giliran."); return; }
+  if (rolled || isMoving) { addLog("⏳ Selesaikan giliran atau tunggu token bergerak."); return; }
   const curr = players[currentPlayer];
   if (curr.jailed) {
     showModal("🚔 DI PENJARA!", `${curr.emoji} ${curr.name} masih dipenjarakan. Giliran dilangkau!`, [{
@@ -390,23 +445,17 @@ async function rollDice() {
     return;
   }
   
-  // Generate final die value
   const dieValue = Math.floor(Math.random() * 6) + 1;
-  
-  // Play animated roll
   await animateRoll(dieValue);
-  
-  // Now apply game logic
   rolled = true;
+  isMoving = true;
   const p = players[currentPlayer];
-  const prev = p.pos;
-  p.pos = (p.pos + dieValue) % SPACES.length;
-  if (p.pos < prev && prev !== 0) { p.score += 5; addLog(`${p.emoji} Melepasi petak MULA! +5 mata`); }
-  addLog(`${p.emoji} ${p.name}: Dadu menunjukkan ${dieValue} → gerak ke ruang ${p.pos} (${SPACES[p.pos].label})`);
-  renderTokens();
-  highlightCell(p.pos);
-  document.getElementById('end-btn').style.display = 'inline-block';
-  setTimeout(() => handleLanding(p, SPACES[p.pos]), 500);
+  const finalPos = await animateStepwise(p, dieValue);
+  await flashCell('cell-' + finalPos);
+  addLog(`${p.emoji} ${p.name}: Dadu ${dieValue} → gerak ke ruang ${finalPos} (${SPACES[finalPos].label})`);
+  renderPlayers();
+  await new Promise(r => setTimeout(r, 300));
+  handleLanding(p, SPACES[finalPos]);
 }
 
 function handleLanding(p, sp) {
@@ -419,16 +468,19 @@ function handleLanding(p, sp) {
           closeModal();
           addLog(`${p.name} dipenjarakan!`);
           renderPlayers();
+          endTurn();
         }
       }]);
     } else {
       addLog(`${p.name} tiba di ${sp.label}. Tiada kuiz.`);
+      endTurn();
     }
     return;
   }
   const quiz = QUIZ_BANK[sp.id];
   if (!quiz) {
     addLog(`Ruang ${sp.id} tiada data kuiz, tiada mata.`);
+    endTurn();
     return;
   }
   const pts = sp.pts || 1;
@@ -453,7 +505,6 @@ function handleLanding(p, sp) {
       const isCorrect = (idx === quiz.jawapan);
       const correctLetter = letters[quiz.jawapan];
       const correctText = quiz.pilihan[quiz.jawapan];
-      
       if (isCorrect) {
         p.score += pts;
         addLog(`✅ ${p.emoji} ${p.name} menjawab BETUL! +${pts} mata. (Jawapan: ${letters[idx]})`);
@@ -464,7 +515,7 @@ function handleLanding(p, sp) {
       }
       renderPlayers();
       closeModal();
-      showResult(isCorrect, pts, correctLetter, correctText);
+      showResult(isCorrect, pts, correctLetter, correctText, () => endTurn());
     };
     optionsContainer.appendChild(btn);
   });
@@ -474,23 +525,22 @@ function handleLanding(p, sp) {
   cancelBtn.onclick = () => {
     addLog(`${p.emoji} ${p.name} memilih untuk tidak menjawab. Tiada mata.`);
     closeModal();
+    endTurn();
   };
   btnsDiv.appendChild(cancelBtn);
   document.getElementById('modal').classList.add('show');
 }
 
 function endTurn() {
-  if (!rolled) {
-    addLog("Anda belum buang dadu! Klik 'Buang Dadu' dahulu.");
-    return;
-  }
+  if (!rolled && !isMoving) return;
   rolled = false;
+  isMoving = false;
   updateDieFace(1);
-  document.getElementById('end-btn').style.display = 'none';
   clearHighlight();
   currentPlayer = (currentPlayer + 1) % players.length;
   updateTurnLabel();
   renderPlayers();
+  updateActiveToken();
   checkWinner();
   addLog(`🔄 Giliran bertukar kepada ${players[currentPlayer].emoji} ${players[currentPlayer].name}`);
 }
@@ -502,15 +552,24 @@ function checkWinner() {
   }
 }
 
+function updateActiveToken() {
+  const allTokens = document.querySelectorAll('#tokens-layer .ptoken');
+  allTokens.forEach(t => t.classList.remove('token-active'));
+  if (players[currentPlayer]) {
+    const tokens = document.querySelectorAll('#tokens-layer .ptoken');
+    if (tokens[currentPlayer]) tokens[currentPlayer].classList.add('token-active');
+  }
+}
+
 function highlightCell(id) {
   document.querySelectorAll('.cell-hit.highlight').forEach(c => c.classList.remove('highlight'));
-  const el = document.getElementById('cell-' + id);
-  if (el) el.classList.add('highlight');
+  const el = document.getElementById('cell-'+id); if (el) el.classList.add('highlight');
 }
 function clearHighlight() { document.querySelectorAll('.cell-hit.highlight').forEach(c => c.classList.remove('highlight')); }
 
 function renderTokens() {
   const layer = document.getElementById('tokens-layer');
+  if (!layer) return;
   layer.innerHTML = '';
   players.forEach((p, i) => {
     const [lp, tp] = SPACE_POS[p.pos] || [50, 50];
@@ -524,11 +583,11 @@ function renderTokens() {
     el.textContent = p.emoji;
     layer.appendChild(el);
   });
+  updateActiveToken();
 }
 
 function renderPlayers() {
   const container = document.getElementById('players-row');
-  if (!container) return;
   container.innerHTML = players.map((p, i) =>
     `<div class="player-card${i === currentPlayer ? ' active' : ''}">
       <div class="token-badge" style="background:${p.color}">${p.emoji}</div>
@@ -542,16 +601,13 @@ function renderPlayers() {
 
 function updateTurnLabel() {
   const p = players[currentPlayer];
-  const label = document.getElementById('turn-label');
-  if (label) label.textContent = `Giliran: ${p.emoji} ${p.name} ${p.jailed ? '(Dipenjara seterusnya)' : ''}`;
+  document.getElementById('turn-label').textContent = `Giliran: ${p.emoji} ${p.name} ${p.jailed ? '(Dipenjara)' : ''}`;
 }
 
 function addLog(msg) {
   const logDiv = document.getElementById('log');
-  if (logDiv) {
-    logDiv.innerHTML += `<div>› ${msg}</div>`;
-    logDiv.parentElement.scrollTop = logDiv.parentElement.scrollHeight;
-  }
+  logDiv.innerHTML += `<div>› ${msg}</div>`;
+  logDiv.parentElement.scrollTop = logDiv.parentElement.scrollHeight;
 }
 
 function showModal(title, body, btns) {
@@ -572,12 +628,10 @@ function showModal(title, body, btns) {
 }
 function closeModal() { document.getElementById('modal').classList.remove('show'); }
 
-// Event listeners
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('num-players')?.addEventListener('change', buildNameInputs);
   document.getElementById('start-btn')?.addEventListener('click', startGame);
   document.getElementById('roll-btn')?.addEventListener('click', rollDice);
-  document.getElementById('end-btn')?.addEventListener('click', endTurn);
   loadGameData();
 });
 </script>
