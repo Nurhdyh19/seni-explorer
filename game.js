@@ -1,5 +1,6 @@
+// game.js (modified with localization support)
 // ============================================================
-// SENI EKSPLORER – Lap-based Racing Game
+// SENI EKSPLORER – Lap-based Racing Game with Localization
 // ============================================================
 
 let spaceSequence = [];
@@ -10,8 +11,25 @@ let isMoving = false;
 let targetLaps = 4;
 let gameActive = true;
 
+// Localization
+let uiText = {};
+let localizationLoaded = false;
+
 const COLORS = ['#E74C3C','#3498DB','#2ECC71','#9B59B6'];
 const EMOJIS = ['🎨','🖌️','✏️','🖼️'];
+
+// Helper function to get localized text
+function t(key, params = {}) {
+  let text = uiText[key];
+  if (!text) {
+    console.warn(`Missing localization key: ${key}`);
+    return key;
+  }
+  for (const [param, value] of Object.entries(params)) {
+    text = text.replace(new RegExp(`{${param}}`, 'g'), value);
+  }
+  return text;
+}
 
 // ---------- NAVIGATION & RESET CONTROL ----------
 let movementCancelled = false;
@@ -170,7 +188,12 @@ function checkWinner() {
   if (winner) {
     gameActive = false;
     playSfx('correct');
-    showModalWithImage('🏆 TAHNIAH!', `${winner.emoji} ${winner.name} menang dengan ${winner.laps} pusingan! 🎉`, null, [{label: 'Main Semula', fn: () => location.reload()}]);
+    showModalWithImage(
+      t('modal_winner_title'),
+      t('modal_winner_message', { emoji: winner.emoji, name: winner.name, laps: winner.laps }),
+      null,
+      [{ label: t('modal_play_again'), fn: () => location.reload() }]
+    );
     return true;
   }
   return false;
@@ -253,12 +276,10 @@ async function animateStepwise(player, steps) {
   for (let step = 1; step <= steps; step++) {
     if (movementCancelled || !gameActive) return currentIndex;
     let nextIndex = (currentIndex + 1) % totalSpaces;
-    // Check if passing MULA (position index wraps from last to 0)
     if (nextIndex < currentIndex && currentIndex !== 0) {
       player.laps++;
-      addLog(`${player.emoji} ${player.name} melengkapkan 1 pusingan! (${player.laps}/${targetLaps})`);
-      // check winner immediately after lap increment
-      if (checkWinner()) return currentIndex; // early exit
+      addLog(t('log_lap_complete', { emoji: player.emoji, name: player.name, laps: player.laps, target: targetLaps }));
+      if (checkWinner()) return currentIndex;
     }
     player.pos = nextIndex;
     renderTokens();
@@ -292,20 +313,117 @@ function buildNameInputs() {
   const container = document.getElementById('name-inputs');
   container.innerHTML = '';
   for (let i = 0; i < n; i++) {
-    container.innerHTML += `<div class="setup-row"><label>${EMOJIS[i]} Pemain ${i+1}:</label><input id="pname${i}" type="text" value="Pemain ${i+1}"></div>`;
+    container.innerHTML += `<div class="setup-row"><label>${t('player_name_label', { number: i+1 })}</label><input id="pname${i}" type="text" value="${t('player_name_placeholder', { number: i+1 })}"></div>`;
   }
+}
+
+// Localization loader
+async function loadLocalization() {
+  try {
+    const response = await fetch('strings.yaml');
+    if (!response.ok) throw new Error(`HTTP ${response.status}: strings.yaml not found`);
+    const yamlText = await response.text();
+    const data = jsyaml.load(yamlText);
+    uiText = data;
+    localizationLoaded = true;
+    applyLocalizationToUI();
+  } catch (err) {
+    console.error('Failed to load localization:', err);
+    // Fallback defaults (hardcoded Malay)
+    uiText = {};
+    localizationLoaded = true;
+    applyLocalizationToUI();
+  }
+}
+
+function applyLocalizationToUI() {
+  // Navigation buttons
+  const homeBtn = document.getElementById('nav-home');
+  if (homeBtn) homeBtn.textContent = t('nav_home');
+  const restartBtn = document.getElementById('nav-restart');
+  if (restartBtn) restartBtn.textContent = t('nav_restart');
+  const soundBtn = document.getElementById('nav-sound');
+  if (soundBtn) soundBtn.textContent = sfxEnabled ? t('nav_sound_on') : t('nav_sound_off');
+  const guideBtn = document.getElementById('nav-guide');
+  if (guideBtn) guideBtn.textContent = t('nav_guide');
+  
+  // Setup panel
+  const setupTitle = document.querySelector('#setup h2');
+  if (setupTitle) setupTitle.textContent = t('setup_title');
+  const numPlayersLabel = document.querySelector('#setup .setup-row:first-child label');
+  if (numPlayersLabel) numPlayersLabel.textContent = t('setup_num_players_label');
+  const lapsLabel = document.querySelector('#setup .setup-row:nth-child(2) label');
+  if (lapsLabel) lapsLabel.textContent = t('setup_laps_label');
+  const startBtn = document.getElementById('start-btn');
+  if (startBtn) startBtn.textContent = t('setup_start_btn');
+  
+  // Populate num-players select with localized options
+  const numSelect = document.getElementById('num-players');
+  if (numSelect) {
+    const currentVal = numSelect.value;
+    numSelect.innerHTML = '';
+    for (let i = 2; i <= 4; i++) {
+      const option = document.createElement('option');
+      option.value = i;
+      option.textContent = t('setup_num_players_option', { count: i });
+      if (currentVal == i) option.selected = true;
+      numSelect.appendChild(option);
+    }
+  }
+  
+  // Populate target-laps select with localized options
+  const lapsSelect = document.getElementById('target-laps');
+  if (lapsSelect) {
+    const currentVal = lapsSelect.value;
+    lapsSelect.innerHTML = '';
+    for (let i = 1; i <= 10; i++) {
+      const option = document.createElement('option');
+      option.value = i;
+      option.textContent = t('setup_laps_option', { count: i });
+      if (currentVal == i) option.selected = true;
+      lapsSelect.appendChild(option);
+    }
+  }
+  
+  // Roll button
+  const rollBtn = document.getElementById('roll-btn');
+  if (rollBtn) rollBtn.textContent = t('roll_dice_btn');
+  
+  // Turn label placeholder
+  if (players.length > 0 && currentPlayer < players.length) {
+    updateTurnLabel();
+  }
+  
+  attachHoverSounds();
 }
 
 async function loadGameData() {
   try {
-    const response = await fetch('game-data.yaml');
-    if (!response.ok) throw new Error(`HTTP ${response.status}: fail game-data.yaml tidak dijumpai`);
-    const yamlText = await response.text();
+    // Load both game data and localization
+    const [gameResponse, locResponse] = await Promise.all([
+      fetch('game-data.yaml'),
+      fetch('strings.yaml').catch(() => null)
+    ]);
+    
+    if (!gameResponse.ok) throw new Error(`HTTP ${gameResponse.status}: fail game-data.yaml tidak dijumpai`);
+    const yamlText = await gameResponse.text();
     const data = jsyaml.load(yamlText);
     spaceSequence = data.space_sequence;
     spacePositions = data.space_positions;
     spacesData = data.spaces;
     if (!spaceSequence || !spacePositions || !spacesData) throw new Error('Data tidak lengkap');
+    
+    // Load localization if available
+    if (locResponse && locResponse.ok) {
+      const locYaml = await locResponse.text();
+      const locData = jsyaml.load(locYaml);
+      uiText = locData;
+    } else {
+      console.warn('strings.yaml not found, using defaults');
+      uiText = {};
+    }
+    localizationLoaded = true;
+    applyLocalizationToUI();
     
     preloadAllSpaceImages();
     
@@ -318,13 +436,12 @@ async function loadGameData() {
       hideSplashScreen();
     }, 500);
   } catch (err) {
-    document.getElementById('loading-message').innerHTML = `❌ Ralat: ${err.message}<br>Pastikan fail <strong>game-data.yaml</strong> berada di folder yang sama.`;
+    document.getElementById('loading-message').innerHTML = t('msg_loading_error', { error: err.message });
     hideSplashScreen();
   }
 }
 
 function startGame() {
-  // Cancel any ongoing movement before starting fresh
   cancelMovement();
   resetMovementFlag();
   
@@ -337,7 +454,7 @@ function startGame() {
   players = [];
   for (let i = 0; i < n; i++) {
     const nameInput = document.getElementById('pname' + i);
-    const name = nameInput ? nameInput.value : `Pemain ${i+1}`;
+    const name = nameInput ? nameInput.value : t('player_name_placeholder', { number: i+1 });
     const startIndex = spaceSequence.indexOf('start');
     players.push({
       name,
@@ -354,7 +471,7 @@ function startGame() {
   buildCells();
   renderTokens();
   renderPlayers();
-  addLog(`🎮 Permainan! Siapa paling cepat ${targetLaps} pusingan menang. 🎮`);
+  addLog(t('game_start_log', { laps: targetLaps }));
   rolled = false;
   isMoving = false;
   updateDieFace(1);
@@ -387,7 +504,7 @@ function onCellClick(idx) {
   const spKey = spaceSequence[idx];
   const sp = spacesData[spKey];
   if (sp) {
-    showModalWithImage(`INFO Ruang ${spKey}`, sp.label || 'Tiada keterangan', spKey, [{label:'Tutup', fn: closeModal}]);
+    showModalWithImage(t('modal_info_title', { spaceKey: spKey }), sp.label || 'Tiada keterangan', spKey, [{label: t('modal_close_btn'), fn: closeModal}]);
   }
 }
 
@@ -405,15 +522,15 @@ function showResult(isCorrect, pointsEarned, correctAnswerLetter, correctAnswerT
     overlay.classList.add('result-correct');
     overlay.classList.remove('result-wrong');
     emojiSpan.textContent = '✅🎉';
-    textDiv.textContent = `BETUL!`;
-    pointsDiv.textContent = `+${pointsEarned} mata`;
+    textDiv.textContent = t('result_correct_title');
+    pointsDiv.textContent = t('result_points_format', { points: pointsEarned });
     playSfx('correct');
   } else {
     overlay.classList.add('result-wrong');
     overlay.classList.remove('result-correct');
     emojiSpan.textContent = '❌😢';
-    textDiv.textContent = `SALAH!`;
-    pointsDiv.textContent = correctAnswerLetter ? `Jawapan betul: ${correctAnswerLetter}. ${correctAnswerText}` : `Tiada mata diperoleh.`;
+    textDiv.textContent = t('result_wrong_title');
+    pointsDiv.textContent = correctAnswerLetter ? t('result_wrong_answer_format', { letter: correctAnswerLetter, text: correctAnswerText }) : `Tiada mata diperoleh.`;
     playSfx('wrong');
   }
   
@@ -433,16 +550,16 @@ function showResult(isCorrect, pointsEarned, correctAnswerLetter, correctAnswerT
 function showDrawingChallenge(p, spKey, sp, pts) {
   playSfx('modalOpen');
   const modalBody = `
-    <div style="font-weight:bold; margin-bottom:10px; color:#F4A820;">🎨 CABARAN LUKISAN DI ATAS KERTAS</div>
+    <div style="font-weight:bold; margin-bottom:10px; color:#F4A820;">${t('drawing_challenge_title')}</div>
     <div style="font-size:14px; margin-bottom:15px;">"${sp.label}"</div>
-    <div style="font-size:12px; color:#ccc; margin-bottom:15px;">Lukis jawapan anda di atas kertas. Selepas siap, pilih sama ada lukisan anda betul atau salah.</div>
+    <div style="font-size:12px; color:#ccc; margin-bottom:15px;">${t('drawing_instruction')}</div>
     <div style="display:flex; gap:10px; justify-content:center; margin-top:5px;">
-      <button id="drawing-betul" class="sound-btn" style="background:#2ECC71; color:#fff; border-color:#2ECC71;">✅ Betul (+${pts} mata)</button>
-      <button id="drawing-salah" class="sound-btn" style="background:#E74C3C; color:#fff; border-color:#E74C3C;">❌ Salah</button>
-      <button id="drawing-skip" class="sound-btn" style="background:#555; color:#fff;">⏭️ Skip</button>
+      <button id="drawing-betul" class="sound-btn" style="background:#2ECC71; color:#fff; border-color:#2ECC71;">${t('drawing_btn_correct', { points: pts })}</button>
+      <button id="drawing-salah" class="sound-btn" style="background:#E74C3C; color:#fff; border-color:#E74C3C;">${t('drawing_btn_wrong')}</button>
+      <button id="drawing-skip" class="sound-btn" style="background:#555; color:#fff;">${t('drawing_btn_skip')}</button>
     </div>
   `;
-  document.getElementById('modal-title').innerHTML = `✏️ Ruang ${spKey} — Lukis di Kertas`;
+  document.getElementById('modal-title').innerHTML = t('drawing_title', { spaceKey: spKey });
   document.getElementById('modal-body').innerHTML = modalBody;
   const btnsDiv = document.getElementById('modal-btns');
   btnsDiv.innerHTML = '';
@@ -459,7 +576,7 @@ function showDrawingChallenge(p, spKey, sp, pts) {
       betulBtn.onclick = () => {
         playSfx('click');
         p.score += pts;
-        addLog(`🎨 ${p.emoji} ${p.name} melukis dengan betul! +${pts} mata.`);
+        addLog(t('drawing_log_correct', { emoji: p.emoji, name: p.name, points: pts }));
         renderPlayers();
         closeModal();
         const imageUrl = getSpaceImageUrl(spKey);
@@ -469,7 +586,7 @@ function showDrawingChallenge(p, spKey, sp, pts) {
     if (salahBtn) {
       salahBtn.onclick = () => {
         playSfx('click');
-        addLog(`❌ ${p.emoji} ${p.name} mengaku lukisan salah. Tiada mata.`);
+        addLog(t('drawing_log_wrong', { emoji: p.emoji, name: p.name }));
         closeModal();
         showResult(false, 0, "", "", () => endTurn(), null);
       };
@@ -477,7 +594,7 @@ function showDrawingChallenge(p, spKey, sp, pts) {
     if (skipBtn) {
       skipBtn.onclick = () => {
         playSfx('click');
-        addLog(`⏭️ ${p.emoji} ${p.name} memilih untuk skip cabaran lukisan. Tiada mata.`);
+        addLog(t('drawing_log_skip', { emoji: p.emoji, name: p.name }));
         closeModal();
         endTurn();
       };
@@ -486,12 +603,12 @@ function showDrawingChallenge(p, spKey, sp, pts) {
 }
 
 async function rollDice() {
-  if (!gameActive) { addLog("Permainan sudah tamat. Muat semula halaman untuk main semula."); return; }
-  if (rolled || isMoving) { addLog("⏳ Selesaikan giliran atau tunggu token bergerak."); return; }
+  if (!gameActive) { addLog(t('msg_game_ended')); return; }
+  if (rolled || isMoving) { addLog(t('msg_wait_turn')); return; }
   const curr = players[currentPlayer];
   if (curr.jailed) {
-    showModalWithImage("🚔 DI PENJARA!", `${curr.emoji} ${curr.name} masih dipenjarakan. Giliran dilangkau!`, 'jail', [{
-      label: "OK", fn: () => {
+    showModalWithImage(t('modal_jail_title'), t('modal_jail_message', { emoji: curr.emoji, name: curr.name }), 'jail', [{
+      label: t('modal_ok_btn'), fn: () => {
         playSfx('click');
         closeModal();
         addLog(`⛓️ ${curr.name} dalam penjara, langkau giliran.`);
@@ -509,13 +626,12 @@ async function rollDice() {
   isMoving = true;
   const p = players[currentPlayer];
   const finalIndex = await animateStepwise(p, dieValue);
-  // if game ended during movement, stop further actions
   if (!gameActive || movementCancelled) return;
   await flashCell(finalIndex);
   if (!gameActive || movementCancelled) return;
   const finalKey = spaceSequence[finalIndex];
   const finalSpace = spacesData[finalKey];
-  addLog(`${p.emoji} ${p.name}: Dadu ${dieValue} → gerak ke ruang ${finalKey} (${finalSpace.label})`);
+  addLog(t('log_rolled_moved', { emoji: p.emoji, name: p.name, dice: dieValue, spaceKey: finalKey, spaceLabel: finalSpace.label }));
   renderPlayers();
   await new Promise(r => setTimeout(r, 300));
   if (!gameActive || movementCancelled) return;
@@ -528,18 +644,18 @@ function handleLanding(p, spaceIndex) {
   if (!sp) return;
   if (sp.type === 'corner') {
     if (spaceKey === 'jail') {
-      showModalWithImage("🚔 GO TO JAIL", `${p.emoji} ${p.name} ditangkap! Anda dipenjarakan dan akan kehilangan giliran seterusnya.`, 'jail', [{
-        label: "Okay...", fn: () => {
+      showModalWithImage(t('modal_jail_landing_title'), t('modal_jail_landing_message', { emoji: p.emoji, name: p.name }), 'jail', [{
+        label: t('modal_jail_ok_btn'), fn: () => {
           playSfx('click');
           p.jailed = true;
           closeModal();
-          addLog(`${p.name} dipenjarakan!`);
+          addLog(t('log_jailed', { name: p.name }));
           renderPlayers();
           endTurn();
         }
       }]);
     } else {
-      addLog(`${p.name} tiba di ${sp.label}. Tiada kuiz.`);
+      addLog(t('msg_corner_no_quiz', { name: p.name, label: sp.label }));
       endTurn();
     }
     return;
@@ -557,10 +673,10 @@ function handleLanding(p, spaceIndex) {
     playSfx('modalOpen');
     const modalBody = `
       <div style="font-weight:bold; margin-bottom:10px; color:#F4A820;">🎨 ${sp.label}</div>
-      <div style="font-size:12px; margin-bottom:8px;">⭐ Nilai: ${pts} mata (pilih jawapan)</div>
+      <div style="font-size:12px; margin-bottom:8px;">${t('quiz_points_label', { points: pts })}</div>
       <div id="quiz-options"></div>
     `;
-    document.getElementById('modal-title').innerHTML = `📝 Cabaran Seni — Ruang ${spaceKey}`;
+    document.getElementById('modal-title').innerHTML = t('quiz_title', { spaceKey: spaceKey });
     document.getElementById('modal-body').innerHTML = modalBody;
     const btnsDiv = document.getElementById('modal-btns');
     btnsDiv.innerHTML = '';
@@ -580,9 +696,9 @@ function handleLanding(p, spaceIndex) {
         const correctText = choices[answerIndex];
         if (isCorrect) {
           p.score += pts;
-          addLog(`✅ ${p.emoji} ${p.name} menjawab BETUL! +${pts} mata. (Jawapan: ${letters[idx]})`);
+          addLog(t('quiz_log_correct', { emoji: p.emoji, name: p.name, points: pts, answer: letters[idx] }));
         } else {
-          addLog(`❌ ${p.emoji} ${p.name} menjawab SALAH. Jawapan betul: ${correctLetter}. ${correctText}. Tiada mata.`);
+          addLog(t('quiz_log_wrong', { emoji: p.emoji, name: p.name, correctLetter: correctLetter, correctText: correctText }));
         }
         renderPlayers();
         closeModal();
@@ -592,11 +708,11 @@ function handleLanding(p, spaceIndex) {
       optionsContainer.appendChild(btn);
     });
     const cancelBtn = document.createElement('button');
-    cancelBtn.textContent = 'Batal / Skip (tiada mata)';
+    cancelBtn.textContent = t('modal_skip_btn');
     cancelBtn.style.backgroundColor = '#444';
     cancelBtn.onclick = () => {
       playSfx('click');
-      addLog(`${p.emoji} ${p.name} memilih untuk tidak menjawab. Tiada mata.`);
+      addLog(t('quiz_log_skip', { emoji: p.emoji, name: p.name }));
       closeModal();
       endTurn();
     };
@@ -617,19 +733,19 @@ function endTurn() {
   updateDieFace(1);
   clearHighlight();
   
-  // move to next player
   currentPlayer = (currentPlayer + 1) % players.length;
   
   updateTurnLabel();
   renderPlayers();
   updateActiveToken();
-  addLog(`🔄 Giliran bertukar kepada ${players[currentPlayer].emoji} ${players[currentPlayer].name}`);
+  addLog(t('log_turn_change', { emoji: players[currentPlayer].emoji, name: players[currentPlayer].name }));
 }
 
 function updateTurnLabel() {
   const p = players[currentPlayer];
+  const jailedSuffix = p.jailed ? t('turn_label_jailed_suffix') : '';
   const label = document.getElementById('turn-label');
-  if (label) label.textContent = `Giliran: ${p.emoji} ${p.name} ${p.jailed ? '(Dipenjara)' : ''}`;
+  if (label) label.textContent = t('turn_label_format', { emoji: p.emoji, name: p.name, jailed: jailedSuffix });
 }
 
 function updateActiveToken() {
@@ -673,8 +789,8 @@ function renderPlayers() {
       <div class="token-badge" style="background:${p.color}">${p.emoji}</div>
       <div>
         <div class="player-name">${p.name} ${p.jailed ? '🚫' : ''}</div>
-        <div class="player-score">⭐ ${p.score} mata</div>
-        <div class="player-laps">🏁 ${p.laps} / ${targetLaps} pusingan</div>
+        <div class="player-score">${t('player_score_label', { score: p.score })}</div>
+        <div class="player-laps">${t('player_laps_label', { laps: p.laps, target: targetLaps })}</div>
       </div>
     </div>`
   ).join('');
@@ -695,7 +811,7 @@ function showModalWithImage(title, body, imageKey, btns) {
   else mb.innerHTML = body;
   const bc = document.getElementById('modal-btns');
   bc.innerHTML = '';
-  (btns || [{label: 'Tutup', fn: closeModal}]).forEach((b, i) => {
+  (btns || [{label: t('modal_close_btn'), fn: closeModal}]).forEach((b, i) => {
     const btn = document.createElement('button');
     btn.textContent = b.label;
     if (i === 0) btn.style.cssText = 'background:#F4A820;color:#1a1a2e;border-color:#F4A820';
@@ -717,70 +833,51 @@ function closeModal() {
 
 // ---------- NAVIGATION FUNCTIONS ----------
 function returnToHome() {
-  // Cancel any ongoing game activity
   cancelMovement();
-  
-  // Close any open modals or overlays
   closeModal();
   const resultOverlay = document.getElementById('result-overlay');
   if (resultOverlay) resultOverlay.classList.remove('show');
   
-  // Reset game state variables
   gameActive = false;
   rolled = false;
   isMoving = false;
   currentPlayer = 0;
   players = [];
   
-  // Hide game area and show setup
   document.getElementById('game-area').style.display = 'none';
   document.getElementById('setup').style.display = 'block';
   
-  // Clear log
   const logDiv = document.getElementById('log');
   if (logDiv) logDiv.innerHTML = '';
   
-  // Reset turn label
   const turnLabel = document.getElementById('turn-label');
   if (turnLabel) turnLabel.textContent = '';
   
-  // Rebuild name inputs to ensure fresh state
   buildNameInputs();
-  
-  // Reset die face
   updateDieFace(1);
-  
-  // Reattach hover sounds
   attachHoverSounds();
   
-  // Reset movement flag after cleanup
   setTimeout(() => {
     resetMovementFlag();
   }, 100);
   
   playSfx('click');
-  addLog("🏠 Kembali ke menu utama.");
+  addLog(t('log_cancel_return'));
 }
 
 function restartGame() {
-  // Cancel ongoing movement
   cancelMovement();
-  
-  // Close any open modals
   closeModal();
   const resultOverlay = document.getElementById('result-overlay');
   if (resultOverlay) resultOverlay.classList.remove('show');
   
-  // Reset game state flags
   gameActive = false;
   rolled = false;
   isMoving = false;
   
-  // Clear log
   const logDiv = document.getElementById('log');
   if (logDiv) logDiv.innerHTML = '';
   
-  // Reset movement flag and restart
   setTimeout(() => {
     resetMovementFlag();
     startGame();
@@ -793,34 +890,15 @@ function toggleSound() {
   sfxEnabled = !sfxEnabled;
   const soundBtn = document.getElementById('nav-sound');
   if (soundBtn) {
-    soundBtn.innerHTML = sfxEnabled ? "🔊 Sound ON" : "🔇 Sound OFF";
+    soundBtn.innerHTML = sfxEnabled ? t('nav_sound_on') : t('nav_sound_off');
   }
   playSfx('click');
 }
 
 function showGuide() {
   playSfx('modalOpen');
-  const guideContent = `
-    <div style="text-align: left; font-size: 13px; line-height: 1.6;">
-      <p><strong>🎮 Cara Bermain:</strong></p>
-      <ul style="margin: 8px 0 12px 20px;">
-        <li>Tekan 🎲 <strong>Buang Dadu</strong> untuk membaling dadu.</li>
-        <li>Token anda akan bergerak mengikut nombor dadu.</li>
-        <li>Mendarat di ruang <strong>Kuiz</strong> → jawab soalan seni untuk dapat mata.</li>
-        <li>Mendarat di ruang <strong>Lukisan</strong> → lakukan cabaran lukisan di kertas.</li>
-        <li>Lengkapkan <strong>pusingan</strong> untuk meningkatkan lap anda.</li>
-        <li>Pemain pertama mencapai ${targetLaps || 4} pusingan akan menang!</li>
-      </ul>
-      <p><strong>⭐ Mata:</strong></p>
-      <ul style="margin: 8px 0 12px 20px;">
-        <li>Kuiz betul → dapat mata mengikut nilai ruang.</li>
-        <li>Cabaran lukisan → nilai bergantung pada kreativiti.</li>
-        <li>Penjara → akan kehilangan giliran seterusnya.</li>
-      </ul>
-      <p><em>Selamat bermain dan jadi peneroka seni terbaik! 🎨</em></p>
-    </div>
-  `;
-  showModalWithImage("📖 Panduan Permainan", guideContent, null, [{label: "Tutup", fn: closeModal}]);
+  const guideContent = t('guide_content', { laps: targetLaps });
+  showModalWithImage(t('guide_title'), guideContent, null, [{label: t('modal_close_btn'), fn: closeModal}]);
 }
 
 // ---------- INITIALIZATION ----------
@@ -829,7 +907,6 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('start-btn')?.addEventListener('click', () => { playSfx('click'); startGame(); });
   document.getElementById('roll-btn')?.addEventListener('click', () => { playSfx('click'); rollDice(); });
   
-  // Navigation event listeners
   document.getElementById('nav-home')?.addEventListener('click', returnToHome);
   document.getElementById('nav-restart')?.addEventListener('click', restartGame);
   document.getElementById('nav-sound')?.addEventListener('click', toggleSound);

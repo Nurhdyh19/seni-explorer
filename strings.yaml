@@ -1,0 +1,114 @@
+# strings.yaml
+# ============================================================
+# SENI EKSPLORER - Localization File
+# Edit the values below to change any text in the game
+# (Keep the keys on the left, only change the text after the colon)
+# ============================================================
+
+# ---------- NAVIGATION ----------
+nav_home: "🏠 Home"
+nav_restart: "🔄 Restart Game"
+nav_sound_on: "🔊 Sound ON"
+nav_sound_off: "🔇 Sound OFF"
+nav_guide: "📖 Guide"
+
+# ---------- SETUP SCREEN ----------
+setup_title: "⚙️ Tetapan Permainan"
+setup_num_players_label: "Bilangan pemain:"
+setup_num_players_option: "{count} pemain"
+setup_laps_label: "Bilangan pusingan:"
+setup_laps_option: "{count} pusingan"
+setup_start_btn: "Mulakan Permainan 🎲"
+
+# ---------- GAME AREA ----------
+roll_dice_btn: "Buang Dadu"
+turn_label_format: "Giliran: {emoji} {name}{jailed}"
+turn_label_jailed_suffix: " (Dipenjara)"
+game_start_log: "🎮 Permainan! Siapa paling cepat {laps} pusingan menang. 🎮"
+
+# ---------- MODALS ----------
+modal_close_btn: "Tutup"
+modal_ok_btn: "OK"
+modal_skip_btn: "Batal / Skip (tiada mata)"
+modal_info_title: "INFO Ruang {spaceKey}"
+modal_jail_title: "🚔 DI PENJARA!"
+modal_jail_message: "{emoji} {name} masih dipenjarakan. Giliran dilangkau!"
+modal_jail_landing_title: "🚔 GO TO JAIL"
+modal_jail_landing_message: "{emoji} {name} ditangkap! Anda dipenjarakan dan akan kehilangan giliran seterusnya."
+modal_jail_ok_btn: "Okay..."
+modal_winner_title: "🏆 TAHNIAH!"
+modal_winner_message: "{emoji} {name} menang dengan {laps} pusingan! 🎉"
+modal_play_again: "Main Semula"
+
+# ---------- DRAWING CHALLENGE ----------
+drawing_title: "✏️ Ruang {spaceKey} — Lukis di Kertas"
+drawing_challenge_title: "🎨 CABARAN LUKISAN DI ATAS KERTAS"
+drawing_instruction: "Lukis jawapan anda di atas kertas. Selepas siap, pilih sama ada lukisan anda betul atau salah."
+drawing_btn_correct: "✅ Betul (+{points} mata)"
+drawing_btn_wrong: "❌ Salah"
+drawing_btn_skip: "⏭️ Skip"
+drawing_log_correct: "🎨 {emoji} {name} melukis dengan betul! +{points} mata."
+drawing_log_wrong: "❌ {emoji} {name} mengaku lukisan salah. Tiada mata."
+drawing_log_skip: "⏭️ {emoji} {name} memilih untuk skip cabaran lukisan. Tiada mata."
+
+# ---------- QUIZ ----------
+quiz_title: "📝 Cabaran Seni — Ruang {spaceKey}"
+quiz_points_label: "⭐ Nilai: {points} mata (pilih jawapan)"
+quiz_log_correct: "✅ {emoji} {name} menjawab BETUL! +{points} mata. (Jawapan: {answer})"
+quiz_log_wrong: "❌ {emoji} {name} menjawab SALAH. Jawapan betul: {correctLetter}. {correctText}. Tiada mata."
+quiz_log_skip: "{emoji} {name} memilih untuk tidak menjawab. Tiada mata."
+
+# ---------- RESULT OVERLAY ----------
+result_correct_title: "BETUL!"
+result_wrong_title: "SALAH!"
+result_points_format: "+{points} mata"
+result_wrong_answer_format: "Jawapan betul: {letter}. {text}"
+
+# ---------- LOG MESSAGES ----------
+log_lap_complete: "{emoji} {name} melengkapkan 1 pusingan! ({laps}/{target})"
+log_rolled_moved: "{emoji} {name}: Dadu {dice} → gerak ke ruang {spaceKey} ({spaceLabel})"
+log_jailed: "{name} dipenjarakan!"
+log_turn_change: "🔄 Giliran bertukar kepada {emoji} {name}"
+log_cancel_return: "🏠 Kembali ke menu utama."
+
+# ---------- CORNER SPACES ----------
+corner_museum: "MUZIUM SENI 🏛️"
+corner_pudu: "PENJARA PUDU 🔒"
+corner_jail: "JAIL! GO TO JAIL 🚔"
+corner_start: "MULA / START"
+
+# ---------- PLAYER CARD ----------
+player_score_label: "⭐ {score} mata"
+player_laps_label: "🏁 {laps} / {target} pusingan"
+
+# ---------- GUIDE MODAL ----------
+guide_title: "📖 Panduan Permainan"
+guide_content: |
+  <div style="text-align: left; font-size: 13px; line-height: 1.6;">
+    <p><strong>🎮 Cara Bermain:</strong></p>
+    <ul style="margin: 8px 0 12px 20px;">
+      <li>Tekan 🎲 <strong>Buang Dadu</strong> untuk membaling dadu.</li>
+      <li>Token anda akan bergerak mengikut nombor dadu.</li>
+      <li>Mendarat di ruang <strong>Kuiz</strong> → jawab soalan seni untuk dapat mata.</li>
+      <li>Mendarat di ruang <strong>Lukisan</strong> → lakukan cabaran lukisan di kertas.</li>
+      <li>Lengkapkan <strong>pusingan</strong> untuk meningkatkan lap anda.</li>
+      <li>Pemain pertama mencapai {laps} pusingan akan menang!</li>
+    </ul>
+    <p><strong>⭐ Mata:</strong></p>
+    <ul style="margin: 8px 0 12px 20px;">
+      <li>Kuiz betul → dapat mata mengikut nilai ruang.</li>
+      <li>Cabaran lukisan → nilai bergantung pada kreativiti.</li>
+      <li>Penjara → akan kehilangan giliran seterusnya.</li>
+    </ul>
+    <p><em>Selamat bermain dan jadi peneroka seni terbaik! 🎨</em></p>
+  </div>
+
+# ---------- PLAYER NAME INPUT ----------
+player_name_label: "Pemain {number}:"
+player_name_placeholder: "Pemain {number}"
+
+# ---------- ADDITIONAL MESSAGES ----------
+msg_loading_error: "❌ Ralat: {error}<br>Pastikan fail <strong>game-data.yaml</strong> berada di folder yang sama."
+msg_game_ended: "Permainan sudah tamat. Muat semula halaman untuk main semula."
+msg_wait_turn: "⏳ Selesaikan giliran atau tunggu token bergerak."
+msg_corner_no_quiz: "{name} tiba di {label}. Tiada kuiz."
