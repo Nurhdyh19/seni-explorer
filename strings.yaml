@@ -103,7 +103,7 @@ guide_content: |
   Selamat bermain dan jadi peneroka seni terbaik! 🎨
 
 # ---------- PLAYER NAME INPUT ----------
-player_name_label: "Pemain {number}:"
+player_name_label: "{emoji} Pemain {number}:"
 player_name_placeholder: "Pemain {number}"
 
 # ---------- ADDITIONAL MESSAGES ----------

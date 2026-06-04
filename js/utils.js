@@ -93,6 +93,7 @@ function buildNameInputs() {
     const container = document.getElementById('name-inputs');
     container.innerHTML = '';
     for (let i = 0; i < n; i++) {
-        container.innerHTML += `<div class="setup-row"><label>${t('player_name_label', { number: i+1 })}</label><input id="pname${i}" type="text" value="${t('player_name_placeholder', { number: i+1 })}"></div>`;
+        const emoji = EMOJIS[i];
+        container.innerHTML += `<div class="setup-row"><label>${t('player_name_label', { number: i+1, emoji: emoji })}</label><input id="pname${i}" type="text" value="${t('player_name_placeholder', { number: i+1 })}"></div>`;
     }
 }
