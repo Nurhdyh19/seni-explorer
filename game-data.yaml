@@ -1,272 +1,260 @@
-# ============================================================
-# SENI EKSPLORER - GAME DATA (YAML format)
-# Edit this file to change questions, answers, board spaces & points
-# ============================================================
+# SENI EKSPLORER - Game Data
+#
+# Spaces 1 to 36 match the visual numbers on the board.
+# The 4 corners are given named keys: start, jail, museum, pudu.
 
-# ------------------------------------------------------------
-# QUIZ BANK for spaces that have multiple-choice questions
-# Each entry key = space ID (1..36, except corners)
-# ------------------------------------------------------------
-quiz_bank:
-  1:
-    soalan: "Unsur seni manakah paling menonjol dalam karya catan tradisional?"
-    pilihan: ["Garisan", "Warna", "Bentuk", "Jalinan"]
-    jawapan: 1            # 0=A, 1=B, 2=C, 3=D
-  2:
-    soalan: "Garisan melengkung menunjukkan pergerakan apa?"
-    pilihan: ["Kestabilan", "Kekerasan", "Lembut & dinamik", "Statik"]
-    jawapan: 2
-  3:
-    soalan: "Bentuk geometri manakah yang tidak mempunyai sudut?"
-    pilihan: ["Segi empat", "Segi tiga", "Bulatan", "Heksagon"]
-    jawapan: 2
-  4:
-    soalan: "Nyatakan 3 jenis garisan asas dalam seni visual."
-    pilihan: ["Lurus, beralun, zig-zag", "Tebal, nipis, putus-putus", "Melintang, menegak, pepenjuru", "Melengkung, berpusing, beralun"]
-    jawapan: 2
-  5:
-    soalan: "Rupa organik merujuk kepada bentuk..."
-    pilihan: ["Geometri tepat", "Bebas & semula jadi", "Binaan manusia", "Abstrak rawak"]
-    jawapan: 1
-  6:
-    soalan: "Rupa geometri yang mempunyai 4 sisi sama panjang."
-    pilihan: ["Segi empat tepat", "Segi empat sama", "Belah ketupat", "Trapezium"]
-    jawapan: 1
-  7:
-    soalan: "Prinsip rekaan yang menunjukkan perbezaan ketara dipanggil?"
-    pilihan: ["Harmoni", "Kontra", "Irama", "Keseimbangan"]
-    jawapan: 1
-  8:
-    soalan: "Warna sekunder terhasil daripada campuran dua warna..."
-    pilihan: ["Primer", "Tersier", "Neutral", "Pastel"]
-    jawapan: 0
-  9:
-    soalan: "Warna panas biasanya memberikan rasa..."
-    pilihan: ["Dingin & tenang", "Ceria & bertenaga", "Sedih", "Sayu"]
-    jawapan: 1
-  11:
-    soalan: "Prinsip keseimbangan simetri bermaksud?"
-    pilihan: ["Kiri dan kanan sama", "Berat visual tidak sama", "Unsur bebas", "Berselerak"]
-    jawapan: 0
-  12:
-    soalan: "Warna apakah yang terhasil daripada campuran merah + biru?"
-    pilihan: ["Hijau", "Ungu", "Jingga", "Kelabu"]
-    jawapan: 1
-  13:
-    soalan: "Corak berulang dalam seni dikenali sebagai..."
-    pilihan: ["Motif", "Ritma", "Ilusi", "Tekstur"]
-    jawapan: 1
-  14:
-    soalan: "Contoh corak geometri?"
-    pilihan: ["Daun berguguran", "Ombak", "Segi tiga bersusun", "Bunga liar"]
-    jawapan: 2
-  15:
-    soalan: "Satu karya mempunyai 5 warna. Apakah jenis skema warna?"
-    pilihan: ["Monokrom", "Analogus", "Polikrom", "Komplementari"]
-    jawapan: 2
-  16:
-    soalan: "Warna asas (primer) terdiri daripada?"
-    pilihan: ["Merah, Kuning, Biru", "Hijau, Jingga, Ungu", "Hitam, Putih, Kelabu", "Merah, Hijau, Biru"]
-    jawapan: 0
-  17:
-    soalan: "Bayangan dalam lukisan memberi ilusi..."
-    pilihan: ["Kedalaman", "Kecerahan", "Kontras", "Garisan"]
-    jawapan: 0
-  18:
-    soalan: "Sudut pandangan ‘mata burung’ bermaksud?"
-    pilihan: ["Dari atas", "Dari bawah", "Aras mata", "Dari sisi"]
-    jawapan: 0
-  19:
-    soalan: "Apakah jenis sudut dalam lukisan perspektif?"
-    pilihan: ["Satu titik", "Dua titik", "Tiga titik", "Semua di atas"]
-    jawapan: 3
-  21:
-    soalan: "Ritma dalam seni dihasilkan melalui?"
-    pilihan: ["Pengulangan unsur", "Warna gelap", "Kekurangan kontras", "Saiz besar"]
-    jawapan: 0
-  22:
-    soalan: "Garisan zig-zag memberikan perasaan?"
-    pilihan: ["Tenang", "Kecelaruan/gerak pantas", "Lembut", "Melambai"]
-    jawapan: 1
-  23:
-    soalan: "Ilusi 3D pada permukaan 2D menggunakan teknik?"
-    pilihan: ["Perspektif", "Kolaj", "Mozaik", "Stensil"]
-    jawapan: 0
-  24:
-    soalan: "Warna panas yang manakah paling terang?"
-    pilihan: ["Merah", "Jingga", "Kuning", "Magenta"]
-    jawapan: 2
-  25:
-    soalan: "Campuran warna biru + kuning menghasilkan?"
-    pilihan: ["Hijau", "Ungu", "Kelabu", "Jingga"]
-    jawapan: 0
-  26:
-    soalan: "Unsur seni yang merujuk kepada kualiti permukaan?"
-    pilihan: ["Rupa", "Jalinan", "Warna", "Bentuk"]
-    jawapan: 1
-  27:
-    soalan: "Warna sejuk seperti biru sering dikaitkan dengan?"
-    pilihan: ["Api", "Air/tenang", "Marah", "Ceria"]
-    jawapan: 1
-  28:
-    soalan: "Lukisan jalan mengecil ke belakang menggunakan prinsip?"
-    pilihan: ["Saiz", "Perspektif udara", "Perspektif linear", "Kontras"]
-    jawapan: 2
-  30:
-    soalan: "Prinsip keseimbangan tidak formal memberikan rasa..."
-    pilihan: ["Tegar", "Dinamik & santai", "Monoton", "Kaku"]
-    jawapan: 1
-  31:
-    soalan: "Pergerakan dalam seni boleh ditunjukkan melalui?"
-    pilihan: ["Garisan dinamik", "Warna statik", "Bentuk sama", "Ulangan kaku"]
-    jawapan: 0
-  32:
-    soalan: "Objek tidak simetri mempunyai ciri..."
-    pilihan: ["Bahagian kiri ≠ kanan", "Bahagian sama", "Bulat sempurna", "Sudut tepat"]
-    jawapan: 0
-  33:
-    soalan: "Prinsip harmoni terhasil apabila unsur-unsur..."
-    pilihan: ["Bercanggah", "Bersatu padu", "Terasing", "Kontra tinggi"]
-    jawapan: 1
-  34:
-    soalan: "Kontras boleh dicapai melalui perbezaan..."
-    pilihan: ["Warna terang/gelap", "Bentuk sama", "Saiz seragam", "Rupa identik"]
-    jawapan: 0
-  35:
-    soalan: "Penegasan dalam sesebuah karya bertujuan untuk?"
-    pilihan: ["Menonjolkan fokus utama", "Menyembunyikan elemen", "Mengelirukan", "Mengurangkan nilai"]
-    jawapan: 0
-  36:
-    soalan: "Poster yang baik menggunakan prinsip rekaan apa?"
-    pilihan: ["Keseimbangan & kontras", "Hanya warna", "Hanya teks", "Tiada ruang kosong"]
-    jawapan: 0
-
-# ------------------------------------------------------------
-# BOARD SPACES: defines label, type, points for each space (0 to 36)
-# ------------------------------------------------------------
-board_spaces:
-  - id: 0
+spaces:
+  start:
     type: corner
     label: "MULA / START"
-    pts: 0
-  - id: 1
+  1:
+    type: quiz
+    label: "Apakah jenis garisan dalam gambar?"
+    points: 1
+    choices: "Silang pangkah|Lurus|Beralun|Pecah"
+    answer: 1
+  2:
+    type: quiz
     label: "Unsur seni manakah paling menonjol?"
-    pts: 1
-  - id: 2
+    points: 5
+    choices: "Garisan|Bentuk|Ruang|Warna"
+    answer: 4
+  3:
+    type: quiz
     label: "Garisan ini menunjukkan pergerakan apa?"
-    pts: 3
-  - id: 3
-    label: "Lukiskan rumah menggunakan bentuk geometri"
-    pts: 1
-  - id: 4
+    points: 3
+    choices: "Statik|Teguh|Beralun|Tajam"
+    answer: 3
+  4:
+    type: drawing
+    label: "LUKISKAN RUMAH MENGGUNAKAN BENTUK GEOMETRI"
+    points: 3
+  5:
+    type: quiz
     label: "Nyatakan 3 jenis garisan"
-    pts: 3
-  - id: 5
-    label: "Lukiskan rupa organik"
-    pts: 1
-  - id: 6
+    points: 1
+    choices: "Lurus, Beralun, Putus-putus|Bulat, Segi tiga, Segi empat|Merah, Biru, Kuning|Licin, Kasar, Kesat"
+    answer: 1
+  6:
+    type: drawing
+    label: "LUKISKAN RUPA ORGANIK"
+    points: 1
+  7:
+    type: quiz
     label: "Rupa ini organik atau geometri?"
-    pts: 3
-  - id: 7
-    label: "Lukiskan bentuk 2D"
-    pts: 5
-  - id: 8
+    points: 3
+    choices: "Organik|Geometri|Abstrak|Ilusi"
+    answer: 2
+  8:
+    type: drawing
+    label: "LUKISKAN BENTUK 2D"
+    points: 5
+  9:
+    type: quiz
     label: "Nyatakan warna sekunder"
-    pts: 3
-  - id: 9
-    label: "Apakah jenis warna dalam poster?"
-    pts: 1
-  - id: 10
+    points: 3
+    choices: "Merah, Biru|Kuning, Hijau|Hijau, Jingga, Ungu|Hitam, Putih"
+    answer: 3
+  jail:
     type: corner
-    label: "GO TO JAIL 🚔"
-    pts: 0
-  - id: 11
-    label: "Lukiskan bunga simetri seimbang"
-    pts: 1
-  - id: 12
-    label: "Apakah warna yang digunakan?"
-    pts: 3
-  - id: 13
-    label: "Lukiskan corak berulang"
-    pts: 1
-  - id: 14
-    label: "Apakah jenis corak? Berikan 3 contoh."
-    pts: 3
-  - id: 15
-    label: "Perkenalkan berapa warna dalam karya?"
-    pts: 3
-  - id: 16
-    label: "Ada berapa jenis warna?"
-    pts: 1
-  - id: 17
-    label: "Lukiskan menggunakan bayangan imbangan simetri"
-    pts: 1
-  - id: 18
-    label: "Apakah sudut yang terdapat?"
-    pts: 3
-  - id: 19
-    label: "Nyatakan sudut yang terdapat dalam lukisan"
-    pts: 3
-  - id: 20
+    label: "JAIL! GO TO JAIL 🚔"
+  10:
+    type: quiz
+    label: "Apakah objek yang paling menarik perhatian?"
+    points: 1
+    choices: "Payung hitam|Payung warna-warni|Hujan|Jalan raya"
+    answer: 1
+  11:
+    type: drawing
+    label: "LUKISKAN BUNGA YANG SUSUNAN SEIMBANG"
+    points: 3
+  12:
+    type: quiz
+    label: "Adakah gambar ini seimbang?"
+    points: 1
+    choices: "Ya|Tidak|Mungkin|Kurang pasti"
+    answer: 1
+  13:
+    type: drawing
+    label: "LUKISKAN CORAK BERULANG"
+    points: 1
+  14:
+    type: quiz
+    label: "Apakah prinsip rekaan yang terdapat di dalam gambar?"
+    points: 3
+    choices: "Kontra|Harmoni|Keseimbangan|Irama dan Pergerakan"
+    answer: 4
+  15:
+    type: quiz
+    label: "Nyatakan satu pasangan warna kontra"
+    points: 5
+    choices: "Merah & Hijau|Biru & Ungu|Kuning & Jingga|Hitam & Kelabu"
+    answer: 1
+  16:
+    type: quiz
+    label: "Nyatakan 2 prinsip rekaan"
+    points: 3
+    choices: "Harmoni & Kontra|Garisan & Rupa|Warna & Ruang|Bentuk & Jalinan"
+    answer: 1
+  17:
+    type: drawing
+    label: "LUKISKAN OBJEK YANG MEMPUNYAI IMBANGAN SIMETRI"
+    points: 5
+  18:
+    type: quiz
+    label: "Apakah objek yang paling menarik perhatian?"
+    points: 3
+    choices: "Epal hijau|Epal merah|Daun|Bakul"
+    answer: 2
+  museum:
     type: corner
-    label: "FREE PARKING 🅿️"
-    pts: 0
-  - id: 21
-    label: "Riang terhibur, kepada berapa jenis?"
-    pts: 3
-  - id: 22
-    label: "Lukiskan dua jenis garisan berbeza"
-    pts: 3
-  - id: 23
-    label: "Lukiskan bentuk 2D ilusi 3D"
-    pts: 3
-  - id: 24
-    label: "Nyatakan itu warna panas?"
-    pts: 1
-  - id: 25
-    label: "Apakah hasil warna campuran ini dan biru?"
-    pts: 3
-  - id: 26
-    label: "Apakah unsur seni yang digunakan?"
-    pts: 1
-  - id: 27
-    label: "Nyatakan itu warna sejuk"
-    pts: 3
-  - id: 28
-    label: "Lukiskan jalan raya yang semakin kecil ke belakang"
-    pts: 3
-  - id: 29
+    label: "MUZIUM SENI 🏛️"
+  19:
+    type: quiz
+    label: "Ruang terbahagi kepada berapa jenis?"
+    points: 3
+    choices: "Satu|Dua|Tiga|Empat"
+    answer: 2
+  20:
+    type: drawing
+    label: "LUKISKAN BENTUK 2D ILUSI 3D"
+    points: 5
+  21:
+    type: quiz
+    label: "Nyatakan satu warna primer"
+    points: 3
+    choices: "Merah|Hijau|Ungu|Jingga"
+    answer: 1
+  22:
+    type: drawing
+    label: "LUKISKAN DUA GARISAN YANG BERBEZA"
+    points: 1
+  23:
+    type: quiz
+    label: "Apakah hasil warna campuran merah dan kuning?"
+    points: 5
+    choices: "Biru|Jingga|Hijau|Ungu"
+    answer: 2
+  24:
+    type: quiz
+    label: "Apakah unsur seni yang boleh disentuh kasar atau licin?"
+    points: 1
+    choices: "Warna|Rupa|Jalinan|Ruang"
+    answer: 3
+  25:
+    type: quiz
+    label: "Nyatakan satu contoh warna sejuk."
+    points: 3
+    choices: "Merah|Jingga|Biru|Kuning"
+    answer: 3
+  26:
+    type: drawing
+    label: "LUKISKAN JALAN RAYA YANG SEMAKIN KECIL KE BELAKANG"
+    points: 5
+  27:
+    type: quiz
+    label: "Apakah jalinan tampak?"
+    points: 3
+    choices: "Jalinan yang boleh disentuh|Jalinan yang hanya boleh dilihat|Jalinan pada kulit kayu|Jalinan pada tayar"
+    answer: 2
+  pudu:
     type: corner
-    label: "PENJARA PULA 🔒"
-    pts: 0
-  - id: 30
-    label: "Prinsip rekaan — keseimbangan"
-    pts: 3
-  - id: 31
-    label: "Lukiskan objek yang menunjukkan pergerakan"
-    pts: 3
-  - id: 32
-    label: "Lukiskan objek tidak simetri"
-    pts: 1
-  - id: 33
-    label: "Apakah yang paling harmoni?"
-    pts: 3
-  - id: 34
-    label: "Nyatakan apa ciri kontras"
-    pts: 1
-  - id: 35
-    label: "Lukiskan sesuatu yang menjadi penegasan"
-    pts: 1
-  - id: 36
-    label: "Adakah tinjau penggunaan dalam poster?"
-    pts: 3
+    label: "PENJARA PUDU 🔒"
+  28:
+    type: quiz
+    label: "Prinsip rekaan yang menunjukkan pengulangan ialah __________"
+    points: 3
+    choices: "Kontra|Harmoni|Penegasan|Irama dan Pergerakan"
+    answer: 4
+  29:
+    type: drawing
+    label: "LUKISKAN OBJEK YANG MENUNJUKKAN PERGERAKAN"
+    points: 5
+  30:
+    type: quiz
+    label: "Nyatakan empat prinsip rekaan"
+    points: 3
+    choices: "Warna, Garisan, Rupa, Bentuk|Harmoni, Kontra, Penegasan, Imbangan|Kasar, Licin, Keras, Lembut|Terang, Gelap, Pudar, Jelas"
+    answer: 2
+  31:
+    type: drawing
+    label: "LUKISKAN OBJEK TIDAK SIMETRI"
+    points: 1
+  32:
+    type: quiz
+    label: "Apakah maksud harmoni?"
+    points: 5
+    choices: "Sesuatu yang bercanggah|Keadaan yang aman, teratur dan selesa|Susunan yang berserabut|Fokus utama karya"
+    answer: 2
+  33:
+    type: quiz
+    label: "Nyatakan dua ciri kontra"
+    points: 5
+    choices: "Sama saiz, Sama warna|Gelap terang, Besar kecil|Licin, Lembut|Bulat, Bujur"
+    answer: 2
+  34:
+    type: quiz
+    label: "Prinsip rekaan yang menarik perhatian dipanggil _______"
+    points: 3
+    choices: "Penegasan|Kesatuan|Irama|Kepelbagaian"
+    answer: 1
+  35:
+    type: drawing
+    label: "LUKISKAN SATU OBJEK YANG MENJADI PENEGASAN"
+    points: 1
+  36:
+    type: quiz
+    label: "Apakah fungsi penegasan dalam poster?"
+    points: 3
+    choices: "Mengelirukan pembaca|Menarik perhatian dan menyampaikan mesej|Mengisi ruang kosong|Mencantikkan sudut"
+    answer: 2
 
-# ------------------------------------------------------------
-# (Optional) Board cell positions (left,top as percentages)
-# You can adjust these if your board image layout changes
-# ------------------------------------------------------------
+# Exact path of the pieces around the board (counter-clockwise)
+space_sequence:
+  - start
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  - 8
+  - 9
+  - jail
+  - 10
+  - 11
+  - 12
+  - 13
+  - 14
+  - 15
+  - 16
+  - 17
+  - 18
+  - museum
+  - 19
+  - 20
+  - 21
+  - 22
+  - 23
+  - 24
+  - 25
+  - 26
+  - 27
+  - pudu
+  - 28
+  - 29
+  - 30
+  - 31
+  - 32
+  - 33
+  - 34
+  - 35
+  - 36
+
+# Board positions (left%, top%) mathematically aligned for a perfect 40-space loop matching the sequence
 space_positions:
-  - [88.81, 88.52]   # 0
+  - [88.81, 88.52]   # start
   - [78.58, 88.52]   # 1
   - [71.35, 88.52]   # 2
   - [64.21, 88.52]   # 3
@@ -276,30 +264,33 @@ space_positions:
   - [35.51, 88.52]   # 7
   - [28.33, 88.52]   # 8
   - [21.05, 88.52]   # 9
-  - [10.70, 88.52]   # 10
-  - [10.70, 78.25]   # 11
-  - [10.70, 71.14]   # 12
-  - [10.70, 64.04]   # 13
-  - [10.70, 56.95]   # 14
-  - [10.70, 49.79]   # 15
-  - [10.70, 42.65]   # 16
-  - [10.70, 35.56]   # 17
-  - [10.70, 28.46]   # 18
-  - [10.70, 21.24]   # 19
-  - [10.70, 10.90]   # 20
-  - [21.05, 10.90]   # 21
-  - [28.33, 10.90]   # 22
-  - [35.51, 10.90]   # 23
-  - [42.59, 10.90]   # 24
-  - [49.63, 10.90]   # 25
-  - [56.92, 10.90]   # 26
-  - [64.21, 10.90]   # 27
-  - [71.35, 10.90]   # 28
-  - [88.81, 10.90]   # 29
-  - [88.81, 21.24]   # 30
-  - [88.81, 28.46]   # 31
-  - [88.81, 35.56]   # 32
-  - [88.81, 42.65]   # 33
-  - [88.81, 49.79]   # 34
-  - [88.81, 56.95]   # 35
-  - [88.81, 64.04]   # 36
+  - [10.70, 88.52]   # jail
+  - [10.70, 78.25]   # 10
+  - [10.70, 71.14]   # 11
+  - [10.70, 64.04]   # 12
+  - [10.70, 56.95]   # 13
+  - [10.70, 49.79]   # 14
+  - [10.70, 42.65]   # 15
+  - [10.70, 35.56]   # 16
+  - [10.70, 28.46]   # 17
+  - [10.70, 21.24]   # 18
+  - [10.70, 10.90]   # museum
+  - [21.05, 10.90]   # 19
+  - [28.33, 10.90]   # 20
+  - [35.51, 10.90]   # 21
+  - [42.59, 10.90]   # 22
+  - [49.63, 10.90]   # 23
+  - [56.92, 10.90]   # 24
+  - [64.21, 10.90]   # 25
+  - [71.35, 10.90]   # 26
+  - [78.58, 10.90]   # 27
+  - [88.81, 10.90]   # pudu
+  - [88.81, 21.24]   # 28
+  - [88.81, 28.46]   # 29
+  - [88.81, 35.56]   # 30
+  - [88.81, 42.65]   # 31
+  - [88.81, 49.79]   # 32
+  - [88.81, 56.95]   # 33
+  - [88.81, 64.04]   # 34
+  - [88.81, 71.14]   # 35
+  - [88.81, 78.25]   # 36
