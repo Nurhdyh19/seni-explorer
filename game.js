@@ -1,5 +1,5 @@
 // ============================================================
-// SENI EKSPLORER – Full Game Logic with Sound Effects (fixed)
+// SENI EKSPLORER – Full Game Logic with Sound & Image Preloading
 // ============================================================
 
 let spaceSequence = [];
@@ -17,7 +17,6 @@ let sfxEnabled = true;
 function initAudio() {
   if (audioContext) return;
   audioContext = new (window.AudioContext || window.webkitAudioContext)();
-  // play a silent buffer to unlock audio on iOS
   const buffer = audioContext.createBuffer(1, 1, 22050);
   const source = audioContext.createBufferSource();
   source.buffer = buffer;
@@ -31,7 +30,6 @@ function playSfx(type) {
   const gain = audioContext.createGain();
   gain.connect(audioContext.destination);
   gain.gain.value = 0.15;
-
   const osc = audioContext.createOscillator();
   osc.connect(gain);
   
@@ -68,7 +66,6 @@ function playSfx(type) {
       gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.4);
       osc.start(now);
       osc.stop(now + 0.35);
-      // second harmonic
       const osc2 = audioContext.createOscillator();
       const gain2 = audioContext.createGain();
       osc2.connect(gain2);
@@ -99,12 +96,10 @@ function playSfx(type) {
       osc.stop(now + 0.09);
       break;
     default:
-      // if unknown type, do nothing but still need to clean up
       osc.disconnect();
       gain.disconnect();
       return;
   }
-  // No extra osc.start() here – each case already does it.
 }
 
 function attachHoverSounds() {
@@ -115,7 +110,7 @@ function attachHoverSounds() {
   });
 }
 
-function hoverHandler(e) {
+function hoverHandler() {
   playSfx('hover');
 }
 
@@ -128,6 +123,19 @@ function enableAudioOnFirstClick() {
   };
   document.addEventListener('click', handler);
   document.addEventListener('touchstart', handler);
+}
+
+// ---------- IMAGE PRELOADING ----------
+function preloadAllSpaceImages() {
+  if (!spacesData) return;
+  const preloadKeys = [...Object.keys(spacesData), ...spaceSequence]; // ensure all keys
+  preloadKeys.forEach(key => {
+    if (key && typeof key === 'string') {
+      const img = new Image();
+      img.src = `images/${key}.png`;
+    }
+  });
+  console.log('✅ Preloaded all space images');
 }
 
 // ---------- HELPER FUNCTIONS ----------
@@ -251,6 +259,10 @@ async function loadGameData() {
     spacePositions = data.space_positions;
     spacesData = data.spaces;
     if (!spaceSequence || !spacePositions || !spacesData) throw new Error('Data tidak lengkap');
+    
+    // Preload all space images in background
+    preloadAllSpaceImages();
+    
     document.getElementById('loading-message').style.display = 'none';
     document.getElementById('setup').style.display = 'block';
     buildNameInputs();
@@ -312,11 +324,6 @@ function onCellClick(idx) {
   if (sp) {
     showModalWithImage(`INFO Ruang ${spKey}`, sp.label || 'Tiada keterangan', spKey, [{label:'Tutup', fn: closeModal}]);
   }
-}
-
-function playBeep(isCorrect) {
-  if (isCorrect) playSfx('correct');
-  else playSfx('wrong');
 }
 
 function showResult(isCorrect, pointsEarned, correctAnswerLetter, correctAnswerText, onClose, imageUrl = null) {
