@@ -20,6 +20,22 @@ game/
     └── main.js
 ```
 
+## 📄 What Each Non‑JavaScript File Does (For Non‑Coders)
+
+You don’t need to understand programming to edit the game. Most of the time you’ll only touch **`strings.yaml`** (all on‑screen text) and maybe **`game-data.yaml`** (quiz questions).
+
+| File / Folder | What it does | Should you edit it? |
+|---------------|--------------|----------------------|
+| `index.html` | The main webpage. Loads the board, buttons, and all code. | ❌ **No** – only for developers. |
+| `style.css` | Controls colours, fonts, button sizes, animations (flashing, pulsing). | ⚠️ **Optional** – only if you know CSS. |
+| `game-data.yaml` | The **game board data**: space order, positions, quiz questions, answers, points, drawing challenges. | ✅ **Yes** – to change questions, points, or board layout. |
+| `strings.yaml` | **ALL text** in the game: button labels, pop‑up messages, the guide, game logs. | ✅ **Yes** – this is the main file for non‑coders. |
+| `splash.jpg` | The image shown while the game loads. | ✅ **Yes** – replace with your own splash image. |
+| `Copy_of_inovasi_2026.png` | The **board background** (the picture with all spaces). | ✅ **Yes** – replace with your own board design. |
+| `images/` folder | Small images that appear when you click a space (e.g., `1.png`, `jail.png`). | ✅ **Yes** – add or replace images. Name them exactly like the space key. |
+
+---
+
 ## 🧠 What each JavaScript file does (for curious non‑coders)
 
 

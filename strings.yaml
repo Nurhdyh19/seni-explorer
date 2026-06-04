@@ -1,8 +1,8 @@
-# strings.yaml
-# ============================================================
 # SENI EKSPLORER - Localization File
-# Edit the values below to change any text in the game
-# (Keep the keys on the left, only change the text after the colon)
+# ============================================================
+# Guide text uses simple bullet points with "- " at the start of a line.
+# The game will automatically convert them into nice HTML.
+# Do not change the {laps} placeholder – it will be replaced with the actual lap target.
 # ============================================================
 
 # ---------- NAVIGATION ----------
@@ -81,27 +81,26 @@ corner_start: "MULA / START"
 player_score_label: "⭐ {score} mata"
 player_laps_label: "🏁 {laps} / {target} pusingan"
 
-# ---------- GUIDE MODAL ----------
+# ---------- GUIDE MODAL (plain text with bullet points) ----------
+# Use "- " at the beginning of a line to create a bullet.
+# Blank lines will create spacing.
+# The {laps} placeholder will be replaced with the target laps.
 guide_title: "📖 Panduan Permainan"
 guide_content: |
-  <div style="text-align: left; font-size: 13px; line-height: 1.6;">
-    <p><strong>🎮 Cara Bermain:</strong></p>
-    <ul style="margin: 8px 0 12px 20px;">
-      <li>Tekan 🎲 <strong>Buang Dadu</strong> untuk membaling dadu.</li>
-      <li>Token anda akan bergerak mengikut nombor dadu.</li>
-      <li>Mendarat di ruang <strong>Kuiz</strong> → jawab soalan seni untuk dapat mata.</li>
-      <li>Mendarat di ruang <strong>Lukisan</strong> → lakukan cabaran lukisan di kertas.</li>
-      <li>Lengkapkan <strong>pusingan</strong> untuk meningkatkan lap anda.</li>
-      <li>Pemain pertama mencapai {laps} pusingan akan menang!</li>
-    </ul>
-    <p><strong>⭐ Mata:</strong></p>
-    <ul style="margin: 8px 0 12px 20px;">
-      <li>Kuiz betul → dapat mata mengikut nilai ruang.</li>
-      <li>Cabaran lukisan → nilai bergantung pada kreativiti.</li>
-      <li>Penjara → akan kehilangan giliran seterusnya.</li>
-    </ul>
-    <p><em>Selamat bermain dan jadi peneroka seni terbaik! 🎨</em></p>
-  </div>
+  🎮 Cara Bermain:
+  - Tekan 🎲 Buang Dadu untuk membaling dadu.
+  - Token anda akan bergerak mengikut nombor dadu.
+  - Mendarat di ruang Kuiz → jawab soalan seni untuk dapat mata.
+  - Mendarat di ruang Lukisan → lakukan cabaran lukisan di kertas.
+  - Lengkapkan pusingan untuk meningkatkan lap anda.
+  - Pemain pertama mencapai {laps} pusingan akan menang!
+
+  ⭐ Mata:
+  - Kuiz betul → dapat mata mengikut nilai ruang.
+  - Cabaran lukisan → nilai bergantung pada kreativiti.
+  - Penjara → akan kehilangan giliran seterusnya.
+
+  Selamat bermain dan jadi peneroka seni terbaik! 🎨
 
 # ---------- PLAYER NAME INPUT ----------
 player_name_label: "Pemain {number}:"
