@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seni Eksplorer</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',sans-serif;background:#1a1a2e;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:16px;gap:12px}
+  h1{color:#F4A820;font-size:22px;font-weight:700;text-shadow:2px 2px 0 #8B4513;letter-spacing:1px}
+
+  /* Board */
+  #board-wrap{position:relative;width:min(960px,95vw);aspect-ratio:1/1}
+  #board-img{width:100%;height:100%;display:block;border-radius:10px;border:3px solid #8B4513}
+  #cells-layer,#tokens-layer{position:absolute;top:0;left:0;width:100%;height:100%}
+  .cell-hit{position:absolute;cursor:pointer;border-radius:3px;transition:background 0.15s}
+  .cell-hit:hover{background:rgba(255,215,0,0.35);outline:2px solid gold}
+  .cell-hit.highlight{background:rgba(255,215,0,0.5);outline:2px solid gold}
+  .cell-hit.owned{border-bottom:4px solid var(--oc)}
+
+  /* Token */
+  .ptoken{position:absolute;width:4.5%;height:4.5%;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:clamp(12px,2vw,22px);border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,0.6);transition:left 0.5s ease,top 0.5s ease;z-index:20;pointer-events:none;transform:translate(-50%,-50%)}
+
+  /* Controls */
+  #controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center}
+  #dice-display{font-size:32px;min-width:60px;text-align:center}
+  button{font-size:13px;padding:8px 18px;border-radius:8px;border:1.5px solid #F4A820;background:#1a1a2e;color:#F4A820;cursor:pointer;font-weight:600;transition:all 0.15s}
+  button:hover{background:#F4A820;color:#1a1a2e}
+  button:active{transform:scale(0.96)}
+  #roll-btn{background:#F4A820;color:#1a1a2e}
+  #roll-btn:hover{background:#d4920a}
+
+  /* Players */
+  #players-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+  .player-card{background:#16213e;border-radius:10px;padding:8px 14px;border:2px solid #333;display:flex;align-items:center;gap:8px;transition:border-color 0.3s}
+  .player-card.active{border-color:#F4A820;box-shadow:0 0 10px rgba(244,168,32,0.4)}
+  .token-badge{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;border:2px solid rgba(255,255,255,0.3)}
+  .player-name{font-weight:600;color:#fff;font-size:13px}
+  .player-score{color:#aaa;font-size:11px;margin-top:1px}
+
+  /* Log */
+  #log-wrap{background:#0f0f23;border-radius:8px;padding:8px 12px;width:min(960px,95vw);max-height:70px;overflow-y:auto;border:1px solid #333}
+  #log{font-size:11px;color:#aaa;line-height:1.7}
+
+  /* Setup */
+  #setup{background:#16213e;border-radius:14px;padding:20px;width:min(400px,95vw);border:2px solid #F4A820;color:#fff}
+  #setup h2{color:#F4A820;font-size:18px;font-weight:700;margin-bottom:14px;text-align:center}
+  .setup-row{display:flex;gap:10px;align-items:center;margin-bottom:10px;font-size:13px;color:#ccc}
+  select,input[type=text]{font-size:13px;padding:6px 10px;border-radius:6px;border:1px solid #444;background:#0f0f23;color:#fff;width:160px}
+  #start-btn{width:100%;margin-top:10px;padding:10px;font-size:15px;background:#F4A820;color:#1a1a2e;border:none;border-radius:8px;cursor:pointer;font-weight:700}
+  #start-btn:hover{background:#d4920a}
+
+  /* Modal */
+  #modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:none;align-items:center;justify-content:center;z-index:300}
+  #modal.show{display:flex}
+  #modal-box{background:#16213e;border-radius:16px;padding:24px;max-width:340px;width:92%;text-align:center;border:2px solid #F4A820;box-shadow:0 8px 32px rgba(0,0,0,0.6)}
+  #modal-title{font-size:16px;font-weight:700;margin-bottom:10px;color:#F4A820}
+  #modal-body{font-size:13px;color:#ccc;margin-bottom:18px;line-height:1.6;white-space:pre-line}
+  #modal-btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+  #modal-btns button{font-size:13px;padding:8px 16px}
+  #turn-label{color:#F4A820;font-size:13px;font-weight:600}
+</style>
+</head>
+<body>
+
+<h1>🎨 Seni Eksplorer</h1>
+
+<div id="setup">
+  <h2>Tetapan Permainan</h2>
+  <div class="setup-row">
+    <label>Bilangan pemain:</label>
+    <select id="num-players">
+      <option value="2">2 pemain</option>
+      <option value="3">3 pemain</option>
+      <option value="4">4 pemain</option>
+    </select>
+  </div>
+  <div id="name-inputs"></div>
+  <button id="start-btn" onclick="startGame()">Mulakan Permainan 🎲</button>
+</div>
+
+<div id="game-area" style="display:none;flex-direction:column;align-items:center;gap:12px;width:100%">
+  <div id="board-wrap">
+    <img id="board-img" src="Copy_of_inovasi_2026.png" alt="Seni Eksplorer Board"/>
+    <div id="cells-layer"></div>
+    <div id="tokens-layer"></div>
+  </div>
+  <div id="players-row"></div>
+  <div id="controls">
+    <div id="dice-display">🎲</div>
+    <button id="roll-btn" onclick="rollDice()">Buang Dadu</button>
+    <button onclick="endTurn()" id="end-btn" style="display:none">Tamat Giliran</button>
+    <span id="turn-label"></span>
+  </div>
+  <div id="log-wrap"><div id="log"></div></div>
+</div>
+
+<div id="modal">
+  <div id="modal-box">
+    <div id="modal-title"></div>
+    <div id="modal-body"></div>
+    <div id="modal-btns"></div>
+  </div>
+</div>
+
+<script>
+// Space center positions as % [left%, top%] mapped to the board image
+// Board corners ~4.2%, spacing ~8.3% per cell
+// Clockwise: 0=MULA(bottom-right), 1-9 bottom L, 10=jail(bottom-left),
+// 11-19 left col up, 20=top-left, 21-28 top row R, 29=top-right, 30-36 right col down
+const SPACE_POS = [
+  [95.8,95.8], // 0 MULA
+  [87.5,95.8],[79.2,95.8],[70.9,95.8],[62.6,95.8],[54.3,95.8],[46.0,95.8],[37.7,95.8],[29.4,95.8],[21.1,95.8], // 1-9
+  [4.2,95.8],  // 10 JAIL
+  [4.2,87.5],[4.2,79.2],[4.2,70.9],[4.2,62.6],[4.2,54.3],[4.2,46.0],[4.2,37.7],[4.2,29.4],[4.2,21.1], // 11-19
+  [4.2,4.2],   // 20 FREE PARK
+  [12.5,4.2],[20.8,4.2],[29.1,4.2],[37.4,4.2],[45.7,4.2],[54.0,4.2],[62.3,4.2],[70.6,4.2], // 21-28
+  [95.8,4.2],  // 29 corner
+  [95.8,12.5],[95.8,20.8],[95.8,29.1],[95.8,37.4],[95.8,45.7],[95.8,54.0],[95.8,62.3], // 30-36
+];
+
+const SPACES = [
+  {id:0,type:'corner',label:'MULA / START'},
+  {id:1,label:'Unsur seni manakah paling menonjol?',pts:1,cost:5},
+  {id:2,label:'Garisan ini menunjukkan pergerakan apa?',pts:3,cost:8},
+  {id:3,label:'Lukiskan rumah menggunakan bentuk geometri',pts:1,cost:6},
+  {id:4,label:'Nyatakan 3 jenis garisan',pts:3,cost:7},
+  {id:5,label:'Lukiskan rupa organik',pts:1,cost:6},
+  {id:6,label:'Rupa ini organik atau geometri?',pts:3,cost:9},
+  {id:7,label:'Lukiskan bentuk 2D',pts:5,cost:12},
+  {id:8,label:'Nyatakan warna sekunder',pts:3,cost:8},
+  {id:9,label:'Apakah jenis warna dalam poster?',pts:1,cost:5},
+  {id:10,type:'corner',label:'GO TO JAIL 🚔'},
+  {id:11,label:'Lukiskan bunga simetri seimbang',pts:1,cost:6},
+  {id:12,label:'Apakah warna yang digunakan?',pts:3,cost:8},
+  {id:13,label:'Lukiskan corak berulang',pts:1,cost:6},
+  {id:14,label:'Apakah jenis corak? Berikan 3 contoh.',pts:3,cost:9},
+  {id:15,label:'Perkenalkan berapa warna dalam karya?',pts:3,cost:8},
+  {id:16,label:'Ada berapa jenis warna?',pts:1,cost:5},
+  {id:17,label:'Lukiskan menggunakan bayangan imbangan simetri',pts:1,cost:7},
+  {id:18,label:'Apakah sudut yang terdapat?',pts:3,cost:8},
+  {id:19,label:'Nyatakan sudut yang terdapat dalam lukisan',pts:3,cost:9},
+  {id:20,type:'corner',label:'FREE PARKING 🅿️'},
+  {id:21,label:'Riang terhibur, kepada berapa jenis?',pts:3,cost:8},
+  {id:22,label:'Lukiskan dua jenis garisan berbeza',pts:3,cost:10},
+  {id:23,label:'Lukiskan bentuk 2D ilusi 3D',pts:3,cost:10},
+  {id:24,label:'Nyatakan itu warna panas?',pts:1,cost:5},
+  {id:25,label:'Apakah hasil warna campuran ini dan biru?',pts:3,cost:9},
+  {id:26,label:'Apakah unsur seni yang digunakan?',pts:1,cost:5},
+  {id:27,label:'Nyatakan itu warna sejuk',pts:3,cost:8},
+  {id:28,label:'Lukiskan jalan raya yang semakin kecil ke belakang',pts:3,cost:12},
+  {id:29,type:'corner',label:'PENJARA PULA 🔒'},
+  {id:30,label:'Prinsip rekaan — keseimbangan',pts:3,cost:9},
+  {id:31,label:'Lukiskan objek yang menunjukkan pergerakan',pts:3,cost:11},
+  {id:32,label:'Lukiskan objek tidak simetri',pts:1,cost:7},
+  {id:33,label:'Apakah yang paling harmoni?',pts:3,cost:9},
+  {id:34,label:'Nyatakan apa ciri kontras',pts:1,cost:5},
+  {id:35,label:'Lukiskan sesuatu yang menjadi penegasan',pts:1,cost:8},
+  {id:36,label:'Adakah tinjau penggunaan dalam poster?',pts:3,cost:9},
+];
+
+const COLORS=['#E74C3C','#3498DB','#2ECC71','#9B59B6'];
+const EMOJIS=['🎨','🖌️','✏️','🖼️'];
+let players=[], currentPlayer=0, rolled=false;
+
+function buildNameInputs(){
+  const n=parseInt(document.getElementById('num-players').value);
+  const d=document.getElementById('name-inputs'); d.innerHTML='';
+  for(let i=0;i<n;i++)
+    d.innerHTML+=`<div class="setup-row"><label>${EMOJIS[i]} Pemain ${i+1}:</label><input id="pname${i}" type="text" value="Pemain ${i+1}"></div>`;
+}
+document.getElementById('num-players').addEventListener('change',buildNameInputs);
+buildNameInputs();
+
+function startGame(){
+  const n=parseInt(document.getElementById('num-players').value);
+  players=[];
+  for(let i=0;i<n;i++){
+    const name=document.getElementById('pname'+i).value||`Pemain ${i+1}`;
+    players.push({name,pos:0,score:20,color:COLORS[i],emoji:EMOJIS[i],owned:[]});
+  }
+  document.getElementById('setup').style.display='none';
+  const ga=document.getElementById('game-area');
+  ga.style.display='flex';
+  buildCells();
+  renderTokens();
+  renderPlayers();
+  updateTurnLabel();
+}
+
+function buildCells(){
+  const layer=document.getElementById('cells-layer');
+  layer.innerHTML='';
+  SPACE_POS.forEach(([lp,tp],idx)=>{
+    const sp=SPACES[idx]; if(!sp) return;
+    const isCorner=sp.type==='corner';
+    const size=isCorner?8.0:7.2;
+    const el=document.createElement('div');
+    el.className='cell-hit'; el.id='cell-'+idx;
+    el.style.cssText=`left:${lp-size/2}%;top:${tp-size/2}%;width:${size}%;height:${size}%;`;
+    el.title=sp.label;
+    el.onclick=()=>onCellClick(idx);
+    layer.appendChild(el);
+  });
+}
+
+function onCellClick(idx){
+  const sp=SPACES[idx]; if(!sp) return;
+  const owner=players.find(p=>p.owned.includes(idx));
+  let body=sp.label||'';
+  if(sp.pts) body+=`\n\nNilai: ${sp.pts} mata | Harga: ${sp.cost} syiling`;
+  if(owner) body+=`\n\nDimiliki: ${owner.emoji} ${owner.name}`;
+  showModal('Ruang '+idx+(sp.type==='corner'?' — '+sp.label:''), body,[{label:'Tutup',fn:closeModal}]);
+}
+
+function rollDice(){
+  if(rolled) return;
+  rolled=true;
+  const d1=Math.floor(Math.random()*6)+1, d2=Math.floor(Math.random()*6)+1;
+  const total=d1+d2;
+  const de=['','⚀','⚁','⚂','⚃','⚄','⚅'];
+  document.getElementById('dice-display').textContent=de[d1]+de[d2];
+  const p=players[currentPlayer];
+  const prev=p.pos;
+  p.pos=(p.pos+total)%SPACES.length;
+  if(p.pos<prev&&prev!==0){p.score+=5; addLog(`${p.emoji} Lepas MULA! +5 mata`);}
+  addLog(`${p.emoji} ${p.name}: ${d1}+${d2}=${total} → Ruang ${p.pos}`);
+  renderTokens(); highlightCell(p.pos);
+  document.getElementById('end-btn').style.display='inline-block';
+  setTimeout(()=>handleLanding(p,SPACES[p.pos]),600);
+}
+
+function handleLanding(p,sp){
+  if(!sp||sp.type==='corner') return;
+  if(sp.id===10){
+    showModal('GO TO JAIL! 🚔',`${p.emoji} ${p.name} dihantar ke penjara!\nKembali ke ruang 10.`,[{label:'OK',fn:closeModal}]);
+    return;
+  }
+  const owner=players.find(o=>o.owned.includes(sp.id)&&o!==p);
+  if(owner){
+    const rent=Math.ceil(sp.cost/2);
+    p.score=Math.max(0,p.score-rent); owner.score+=rent;
+    addLog(`${p.emoji} bayar sewa ${rent} mata → ${owner.emoji}`);
+    showModal('Bayar Sewa! 💸',`Ruang ${sp.id} dimiliki ${owner.emoji} ${owner.name}\n\nBayar ${rent} mata sewa.`,
+      [{label:'OK',fn:()=>{closeModal();renderPlayers();}}]);
+    return;
+  }
+  if(p.owned.includes(sp.id)){addLog(`${p.emoji} tanah sendiri, selamat!`);return;}
+  const canBuy=p.score>=sp.cost;
+  showModal(`Ruang ${sp.id} — Cabaran Seni! 🎨`,
+    `"${sp.label}"\n\n${canBuy?`Beli untuk ${sp.cost} syiling & dapat ${sp.pts} mata sewa?\nKamu ada ${p.score} mata.`:`Kos ${sp.cost} syiling (kamu ada ${p.score}). Jawab cabaran untuk dapat ${sp.pts} mata!`}`,
+    canBuy?[
+      {label:`🏠 Beli (${sp.cost}🪙)`,fn:()=>{p.owned.push(sp.id);p.score-=sp.cost;p.score+=sp.pts;addLog(`${p.emoji} beli Ruang ${sp.id} +${sp.pts}pts`);markOwned(sp.id,p.color);renderPlayers();closeModal();}},
+      {label:`✏️ Jawab (+${sp.pts}⭐)`,fn:()=>{p.score+=sp.pts;addLog(`${p.emoji} jawab cabaran +${sp.pts}pts`);renderPlayers();closeModal();}}
+    ]:[
+      {label:`✏️ Jawab Cabaran (+${sp.pts}⭐)`,fn:()=>{p.score+=sp.pts;addLog(`${p.emoji} jawab cabaran +${sp.pts}pts`);renderPlayers();closeModal();}}
+    ]
+  );
+}
+
+function markOwned(id,color){
+  const el=document.getElementById('cell-'+id);
+  if(el){el.style.setProperty('--oc',color);el.classList.add('owned');}
+}
+
+function endTurn(){
+  rolled=false;
+  document.getElementById('dice-display').textContent='🎲';
+  document.getElementById('end-btn').style.display='none';
+  clearHighlight();
+  currentPlayer=(currentPlayer+1)%players.length;
+  updateTurnLabel(); renderPlayers(); checkWinner();
+}
+
+function checkWinner(){
+  const w=players.find(p=>p.score>=60);
+  if(w) showModal('🏆 Tahniah!',`${w.emoji} ${w.name} menang dengan ${w.score} mata!`,[{label:'Syabas!',fn:closeModal}]);
+}
+
+function highlightCell(id){
+  document.querySelectorAll('.cell-hit.highlight').forEach(c=>c.classList.remove('highlight'));
+  const el=document.getElementById('cell-'+id); if(el) el.classList.add('highlight');
+}
+function clearHighlight(){document.querySelectorAll('.cell-hit.highlight').forEach(c=>c.classList.remove('highlight'));}
+
+function renderTokens(){
+  const layer=document.getElementById('tokens-layer'); layer.innerHTML='';
+  players.forEach((p,i)=>{
+    const [lp,tp]=SPACE_POS[p.pos]||[50,50];
+    const offsets=[[0,0],[3,0],[0,3],[3,3]];
+    const [ox,oy]=offsets[i];
+    const el=document.createElement('div');
+    el.className='ptoken';
+    el.style.left=(lp+ox*0.5)+'%';
+    el.style.top=(tp+oy*0.5)+'%';
+    el.style.background=p.color;
+    el.textContent=p.emoji;
+    layer.appendChild(el);
+  });
+}
+
+function renderPlayers(){
+  document.getElementById('players-row').innerHTML=players.map((p,i)=>
+    `<div class="player-card${i===currentPlayer?' active':''}">
+      <div class="token-badge" style="background:${p.color}">${p.emoji}</div>
+      <div>
+        <div class="player-name">${p.name}</div>
+        <div class="player-score">⭐ ${p.score} mata · 🏠 ${p.owned.length}</div>
+      </div>
+    </div>`).join('');
+}
+
+function updateTurnLabel(){
+  const p=players[currentPlayer];
+  document.getElementById('turn-label').textContent=`Giliran: ${p.emoji} ${p.name}`;
+}
+
+function addLog(msg){
+  const log=document.getElementById('log');
+  log.innerHTML+=`<div>› ${msg}</div>`;
+  log.parentElement.scrollTop=log.parentElement.scrollHeight;
+}
+
+function showModal(title,body,btns){
+  document.getElementById('modal-title').textContent=title;
+  document.getElementById('modal-body').textContent=body;
+  const bc=document.getElementById('modal-btns');
+  bc.innerHTML='';
+  (btns||[{label:'OK',fn:closeModal}]).forEach((b,i)=>{
+    const btn=document.createElement('button');
+    btn.textContent=b.label;
+    if(i===0) btn.style.cssText='background:#F4A820;color:#1a1a2e;border-color:#F4A820';
+    btn.onclick=b.fn;
+    bc.appendChild(btn);
+  });
+  document.getElementById('modal').classList.add('show');
+}
+function closeModal(){document.getElementById('modal').classList.remove('show');}
+</script>
+</body>
+</html>
