@@ -1,5 +1,5 @@
 // ============================================================
-// SENI EKSPLORER – Full Game Logic with Sound & Image Preloading
+// SENI EKSPLORER – Lap-based Racing Game
 // ============================================================
 
 let spaceSequence = [];
@@ -7,8 +7,35 @@ let spacePositions = [];
 let spacesData = {};
 let players = [], currentPlayer = 0, rolled = false;
 let isMoving = false;
+let targetLaps = 4;
+let gameActive = true;
+
 const COLORS = ['#E74C3C','#3498DB','#2ECC71','#9B59B6'];
 const EMOJIS = ['🎨','🖌️','✏️','🖼️'];
+
+// ---------- NAVIGATION & RESET CONTROL ----------
+let movementCancelled = false;
+
+function cancelMovement() {
+  movementCancelled = true;
+  gameActive = false;
+  isMoving = false;
+}
+
+function resetMovementFlag() {
+  movementCancelled = false;
+}
+
+// ---------- SPLASH SCREEN ----------
+function hideSplashScreen() {
+  const splash = document.getElementById('splash-screen');
+  if (splash) {
+    splash.classList.add('splash-hidden');
+    setTimeout(() => {
+      splash.style.display = 'none';
+    }, 800);
+  }
+}
 
 // ---------- SOUND SYSTEM ----------
 let audioContext = null;
@@ -103,7 +130,7 @@ function playSfx(type) {
 }
 
 function attachHoverSounds() {
-  const interactive = document.querySelectorAll('button, .cell-hit, .player-card, .quiz-opt-btn, #roll-btn, #start-btn');
+  const interactive = document.querySelectorAll('button, .cell-hit, .player-card, .quiz-opt-btn, #roll-btn, #start-btn, .nav-btn');
   interactive.forEach(el => {
     el.removeEventListener('mouseenter', hoverHandler);
     el.addEventListener('mouseenter', hoverHandler);
@@ -128,14 +155,25 @@ function enableAudioOnFirstClick() {
 // ---------- IMAGE PRELOADING ----------
 function preloadAllSpaceImages() {
   if (!spacesData) return;
-  const preloadKeys = [...Object.keys(spacesData), ...spaceSequence]; // ensure all keys
+  const preloadKeys = [...Object.keys(spacesData), ...spaceSequence];
   preloadKeys.forEach(key => {
     if (key && typeof key === 'string') {
       const img = new Image();
       img.src = `images/${key}.png`;
     }
   });
-  console.log('✅ Preloaded all space images');
+}
+
+// ---------- LAP & WIN CONDITIONS ----------
+function checkWinner() {
+  const winner = players.find(p => p.laps >= targetLaps);
+  if (winner) {
+    gameActive = false;
+    playSfx('correct');
+    showModalWithImage('🏆 TAHNIAH!', `${winner.emoji} ${winner.name} menang dengan ${winner.laps} pusingan! 🎉`, null, [{label: 'Main Semula', fn: () => location.reload()}]);
+    return true;
+  }
+  return false;
 }
 
 // ---------- HELPER FUNCTIONS ----------
@@ -186,6 +224,11 @@ async function animateRoll(finalValue) {
   const steps = 16;
   const interval = 25;
   for (let i = 0; i <= steps; i++) {
+    if (movementCancelled || !gameActive) {
+      rollBtn.disabled = false;
+      diceContainer.classList.remove('rolling');
+      return;
+    }
     if (i === steps) updateDieFace(finalValue);
     else updateDieFace(Math.floor(Math.random() * 6) + 1);
     await new Promise(r => setTimeout(r, interval));
@@ -208,10 +251,14 @@ async function animateStepwise(player, steps) {
   let currentIndex = player.pos;
   const totalSpaces = spaceSequence.length;
   for (let step = 1; step <= steps; step++) {
+    if (movementCancelled || !gameActive) return currentIndex;
     let nextIndex = (currentIndex + 1) % totalSpaces;
+    // Check if passing MULA (position index wraps from last to 0)
     if (nextIndex < currentIndex && currentIndex !== 0) {
-      player.score += 5;
-      addLog(`${player.emoji} Melepasi petak MULA! +5 mata`);
+      player.laps++;
+      addLog(`${player.emoji} ${player.name} melengkapkan 1 pusingan! (${player.laps}/${targetLaps})`);
+      // check winner immediately after lap increment
+      if (checkWinner()) return currentIndex; // early exit
     }
     player.pos = nextIndex;
     renderTokens();
@@ -260,36 +307,54 @@ async function loadGameData() {
     spacesData = data.spaces;
     if (!spaceSequence || !spacePositions || !spacesData) throw new Error('Data tidak lengkap');
     
-    // Preload all space images in background
     preloadAllSpaceImages();
     
     document.getElementById('loading-message').style.display = 'none';
     document.getElementById('setup').style.display = 'block';
     buildNameInputs();
     attachHoverSounds();
+    
+    setTimeout(() => {
+      hideSplashScreen();
+    }, 500);
   } catch (err) {
     document.getElementById('loading-message').innerHTML = `❌ Ralat: ${err.message}<br>Pastikan fail <strong>game-data.yaml</strong> berada di folder yang sama.`;
+    hideSplashScreen();
   }
 }
 
 function startGame() {
+  // Cancel any ongoing movement before starting fresh
+  cancelMovement();
+  resetMovementFlag();
+  
   playSfx('click');
   const numSelect = document.getElementById('num-players');
   const n = parseInt(numSelect.value);
+  targetLaps = parseInt(document.getElementById('target-laps').value);
+  gameActive = true;
+  
   players = [];
   for (let i = 0; i < n; i++) {
     const nameInput = document.getElementById('pname' + i);
     const name = nameInput ? nameInput.value : `Pemain ${i+1}`;
     const startIndex = spaceSequence.indexOf('start');
-    players.push({name, pos: startIndex, score: 0, color: COLORS[i], emoji: EMOJIS[i], jailed: false});
+    players.push({
+      name,
+      pos: startIndex,
+      score: 0,
+      laps: 0,
+      color: COLORS[i],
+      emoji: EMOJIS[i],
+      jailed: false
+    });
   }
   document.getElementById('setup').style.display = 'none';
   document.getElementById('game-area').style.display = 'flex';
   buildCells();
   renderTokens();
   renderPlayers();
-  updateTurnLabel();
-  addLog("🎉 Permainan bermula! Giliran pertama.");
+  addLog(`🎮 Permainan! Siapa paling cepat ${targetLaps} pusingan menang. 🎮`);
   rolled = false;
   isMoving = false;
   updateDieFace(1);
@@ -421,6 +486,7 @@ function showDrawingChallenge(p, spKey, sp, pts) {
 }
 
 async function rollDice() {
+  if (!gameActive) { addLog("Permainan sudah tamat. Muat semula halaman untuk main semula."); return; }
   if (rolled || isMoving) { addLog("⏳ Selesaikan giliran atau tunggu token bergerak."); return; }
   const curr = players[currentPlayer];
   if (curr.jailed) {
@@ -438,16 +504,21 @@ async function rollDice() {
   
   const dieValue = Math.floor(Math.random() * 6) + 1;
   await animateRoll(dieValue);
+  if (movementCancelled || !gameActive) return;
   rolled = true;
   isMoving = true;
   const p = players[currentPlayer];
   const finalIndex = await animateStepwise(p, dieValue);
+  // if game ended during movement, stop further actions
+  if (!gameActive || movementCancelled) return;
   await flashCell(finalIndex);
+  if (!gameActive || movementCancelled) return;
   const finalKey = spaceSequence[finalIndex];
   const finalSpace = spacesData[finalKey];
   addLog(`${p.emoji} ${p.name}: Dadu ${dieValue} → gerak ke ruang ${finalKey} (${finalSpace.label})`);
   renderPlayers();
   await new Promise(r => setTimeout(r, 300));
+  if (!gameActive || movementCancelled) return;
   handleLanding(p, finalIndex);
 }
 
@@ -545,20 +616,20 @@ function endTurn() {
   isMoving = false;
   updateDieFace(1);
   clearHighlight();
+  
+  // move to next player
   currentPlayer = (currentPlayer + 1) % players.length;
+  
   updateTurnLabel();
   renderPlayers();
   updateActiveToken();
-  checkWinner();
   addLog(`🔄 Giliran bertukar kepada ${players[currentPlayer].emoji} ${players[currentPlayer].name}`);
 }
 
-function checkWinner() {
-  const winner = players.find(p => p.score >= 30);
-  if (winner) {
-    playSfx('correct');
-    showModalWithImage('🏆 TAHNIAH!', `${winner.emoji} ${winner.name} menang dengan ${winner.score} mata! 🎉`, null, [{label: 'Hebat!', fn: () => location.reload()}]);
-  }
+function updateTurnLabel() {
+  const p = players[currentPlayer];
+  const label = document.getElementById('turn-label');
+  if (label) label.textContent = `Giliran: ${p.emoji} ${p.name} ${p.jailed ? '(Dipenjara)' : ''}`;
 }
 
 function updateActiveToken() {
@@ -603,15 +674,11 @@ function renderPlayers() {
       <div>
         <div class="player-name">${p.name} ${p.jailed ? '🚫' : ''}</div>
         <div class="player-score">⭐ ${p.score} mata</div>
+        <div class="player-laps">🏁 ${p.laps} / ${targetLaps} pusingan</div>
       </div>
     </div>`
   ).join('');
   attachHoverSounds();
-}
-
-function updateTurnLabel() {
-  const p = players[currentPlayer];
-  document.getElementById('turn-label').textContent = `Giliran: ${p.emoji} ${p.name} ${p.jailed ? '(Dipenjara)' : ''}`;
 }
 
 function addLog(msg) {
@@ -648,11 +715,126 @@ function closeModal() {
   document.getElementById('modal').classList.remove('show');
 }
 
+// ---------- NAVIGATION FUNCTIONS ----------
+function returnToHome() {
+  // Cancel any ongoing game activity
+  cancelMovement();
+  
+  // Close any open modals or overlays
+  closeModal();
+  const resultOverlay = document.getElementById('result-overlay');
+  if (resultOverlay) resultOverlay.classList.remove('show');
+  
+  // Reset game state variables
+  gameActive = false;
+  rolled = false;
+  isMoving = false;
+  currentPlayer = 0;
+  players = [];
+  
+  // Hide game area and show setup
+  document.getElementById('game-area').style.display = 'none';
+  document.getElementById('setup').style.display = 'block';
+  
+  // Clear log
+  const logDiv = document.getElementById('log');
+  if (logDiv) logDiv.innerHTML = '';
+  
+  // Reset turn label
+  const turnLabel = document.getElementById('turn-label');
+  if (turnLabel) turnLabel.textContent = '';
+  
+  // Rebuild name inputs to ensure fresh state
+  buildNameInputs();
+  
+  // Reset die face
+  updateDieFace(1);
+  
+  // Reattach hover sounds
+  attachHoverSounds();
+  
+  // Reset movement flag after cleanup
+  setTimeout(() => {
+    resetMovementFlag();
+  }, 100);
+  
+  playSfx('click');
+  addLog("🏠 Kembali ke menu utama.");
+}
+
+function restartGame() {
+  // Cancel ongoing movement
+  cancelMovement();
+  
+  // Close any open modals
+  closeModal();
+  const resultOverlay = document.getElementById('result-overlay');
+  if (resultOverlay) resultOverlay.classList.remove('show');
+  
+  // Reset game state flags
+  gameActive = false;
+  rolled = false;
+  isMoving = false;
+  
+  // Clear log
+  const logDiv = document.getElementById('log');
+  if (logDiv) logDiv.innerHTML = '';
+  
+  // Reset movement flag and restart
+  setTimeout(() => {
+    resetMovementFlag();
+    startGame();
+  }, 50);
+  
+  playSfx('click');
+}
+
+function toggleSound() {
+  sfxEnabled = !sfxEnabled;
+  const soundBtn = document.getElementById('nav-sound');
+  if (soundBtn) {
+    soundBtn.innerHTML = sfxEnabled ? "🔊 Sound ON" : "🔇 Sound OFF";
+  }
+  playSfx('click');
+}
+
+function showGuide() {
+  playSfx('modalOpen');
+  const guideContent = `
+    <div style="text-align: left; font-size: 13px; line-height: 1.6;">
+      <p><strong>🎮 Cara Bermain:</strong></p>
+      <ul style="margin: 8px 0 12px 20px;">
+        <li>Tekan 🎲 <strong>Buang Dadu</strong> untuk membaling dadu.</li>
+        <li>Token anda akan bergerak mengikut nombor dadu.</li>
+        <li>Mendarat di ruang <strong>Kuiz</strong> → jawab soalan seni untuk dapat mata.</li>
+        <li>Mendarat di ruang <strong>Lukisan</strong> → lakukan cabaran lukisan di kertas.</li>
+        <li>Lengkapkan <strong>pusingan</strong> untuk meningkatkan lap anda.</li>
+        <li>Pemain pertama mencapai ${targetLaps || 4} pusingan akan menang!</li>
+      </ul>
+      <p><strong>⭐ Mata:</strong></p>
+      <ul style="margin: 8px 0 12px 20px;">
+        <li>Kuiz betul → dapat mata mengikut nilai ruang.</li>
+        <li>Cabaran lukisan → nilai bergantung pada kreativiti.</li>
+        <li>Penjara → akan kehilangan giliran seterusnya.</li>
+      </ul>
+      <p><em>Selamat bermain dan jadi peneroka seni terbaik! 🎨</em></p>
+    </div>
+  `;
+  showModalWithImage("📖 Panduan Permainan", guideContent, null, [{label: "Tutup", fn: closeModal}]);
+}
+
 // ---------- INITIALIZATION ----------
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('num-players')?.addEventListener('change', buildNameInputs);
   document.getElementById('start-btn')?.addEventListener('click', () => { playSfx('click'); startGame(); });
   document.getElementById('roll-btn')?.addEventListener('click', () => { playSfx('click'); rollDice(); });
+  
+  // Navigation event listeners
+  document.getElementById('nav-home')?.addEventListener('click', returnToHome);
+  document.getElementById('nav-restart')?.addEventListener('click', restartGame);
+  document.getElementById('nav-sound')?.addEventListener('click', toggleSound);
+  document.getElementById('nav-guide')?.addEventListener('click', showGuide);
+  
   attachHoverSounds();
   enableAudioOnFirstClick();
   loadGameData();

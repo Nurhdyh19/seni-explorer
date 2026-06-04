@@ -9,7 +9,20 @@
 </head>
 <body>
 
+<!-- SPLASH SCREEN -->
+<div id="splash-screen">
+  <img src="splash.jpg" alt="Seni Eksplorer" id="splash-image">
+</div>
+
 <h1>🎨 Seni Eksplorer</h1>
+
+<!-- NAVIGATION BAR -->
+<div id="game-nav" class="game-nav">
+  <button id="nav-home" class="nav-btn">🏠 Home</button>
+  <button id="nav-restart" class="nav-btn">🔄 Restart Game</button>
+  <button id="nav-sound" class="nav-btn">🔊 Sound ON</button>
+  <button id="nav-guide" class="nav-btn">📖 Guide</button>
+</div>
 
 <div id="loading-message" class="loading">Memuatkan data permainan...</div>
 
@@ -21,6 +34,21 @@
       <option value="2">2 pemain</option>
       <option value="3">3 pemain</option>
       <option value="4">4 pemain</option>
+    </select>
+  </div>
+  <div class="setup-row">
+    <label>Bilangan pusingan:</label>
+    <select id="target-laps">
+      <option value="1">1 pusingan</option>
+      <option value="2">2 pusingan</option>
+      <option value="3">3 pusingan</option>
+      <option value="4" selected>4 pusingan</option>
+      <option value="5">5 pusingan</option>
+      <option value="6">6 pusingan</option>
+      <option value="7">7 pusingan</option>
+      <option value="8">8 pusingan</option>
+      <option value="9">9 pusingan</option>
+      <option value="10">10 pusingan</option>
     </select>
   </div>
   <div id="name-inputs"></div>
