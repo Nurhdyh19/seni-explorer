@@ -3,34 +3,81 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Seni Eksplorer</title>
+<title>Seni Eksplorer - Kuiz Seni Interaktif</title>
+<script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:'Segoe UI',sans-serif;background:#1a1a2e;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:16px;gap:12px}
   h1{color:#F4A820;font-size:22px;font-weight:700;text-shadow:2px 2px 0 #8B4513;letter-spacing:1px}
 
-  /* Board */
   #board-wrap{position:relative;width:min(960px,95vw);aspect-ratio:1/1}
   #board-img{width:100%;height:100%;display:block;border-radius:10px;border:3px solid #8B4513}
   #cells-layer,#tokens-layer{position:absolute;top:0;left:0;width:100%;height:100%}
   .cell-hit{position:absolute;cursor:pointer;border-radius:3px;transition:background 0.15s}
   .cell-hit:hover{background:rgba(255,215,0,0.35);outline:2px solid gold}
   .cell-hit.highlight{background:rgba(255,215,0,0.5);outline:2px solid gold}
-  .cell-hit.owned{border-bottom:4px solid var(--oc)}
 
-  /* Token */
   .ptoken{position:absolute;width:4.5%;height:4.5%;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:clamp(12px,2vw,22px);border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,0.6);transition:left 0.5s ease,top 0.5s ease;z-index:20;pointer-events:none;transform:translate(-50%,-50%)}
 
-  /* Controls */
   #controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center}
-  #dice-display{font-size:32px;min-width:60px;text-align:center}
+  
+  /* DICE STYLES - with smooth transitions */
+  #dice-display {
+    width: 70px;
+    height: 70px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 8px;
+    transition: transform 0.1s ease;
+  }
+  .die {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 4px;
+    padding: 8px;
+    transition: all 0.05s linear;
+  }
+  .dot {
+    background-color: #e0e0e0;
+    border-radius: 50%;
+    width: 100%;
+    height: 100%;
+    align-self: center;
+    justify-self: center;
+    transition: background-color 0.05s;
+  }
+  .dot.lit {
+    background-color: #1a1a2e;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.2);
+  }
+  
+  /* Rolling animation keyframes */
+  @keyframes rollShake {
+    0% { transform: rotate(0deg) scale(1); }
+    15% { transform: rotate(15deg) scale(1.1); }
+    30% { transform: rotate(-10deg) scale(1.15); }
+    50% { transform: rotate(8deg) scale(1.2); }
+    70% { transform: rotate(-5deg) scale(1.1); }
+    100% { transform: rotate(0deg) scale(1); }
+  }
+  .rolling {
+    animation: rollShake 0.5s cubic-bezier(0.25, 1.5, 0.5, 1);
+  }
+
   button{font-size:13px;padding:8px 18px;border-radius:8px;border:1.5px solid #F4A820;background:#1a1a2e;color:#F4A820;cursor:pointer;font-weight:600;transition:all 0.15s}
   button:hover{background:#F4A820;color:#1a1a2e}
   button:active{transform:scale(0.96)}
   #roll-btn{background:#F4A820;color:#1a1a2e}
   #roll-btn:hover{background:#d4920a}
+  #roll-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
-  /* Players */
   #players-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
   .player-card{background:#16213e;border-radius:10px;padding:8px 14px;border:2px solid #333;display:flex;align-items:center;gap:8px;transition:border-color 0.3s}
   .player-card.active{border-color:#F4A820;box-shadow:0 0 10px rgba(244,168,32,0.4)}
@@ -38,11 +85,9 @@
   .player-name{font-weight:600;color:#fff;font-size:13px}
   .player-score{color:#aaa;font-size:11px;margin-top:1px}
 
-  /* Log */
   #log-wrap{background:#0f0f23;border-radius:8px;padding:8px 12px;width:min(960px,95vw);max-height:70px;overflow-y:auto;border:1px solid #333}
   #log{font-size:11px;color:#aaa;line-height:1.7}
 
-  /* Setup */
   #setup{background:#16213e;border-radius:14px;padding:20px;width:min(400px,95vw);border:2px solid #F4A820;color:#fff}
   #setup h2{color:#F4A820;font-size:18px;font-weight:700;margin-bottom:14px;text-align:center}
   .setup-row{display:flex;gap:10px;align-items:center;margin-bottom:10px;font-size:13px;color:#ccc}
@@ -50,23 +95,57 @@
   #start-btn{width:100%;margin-top:10px;padding:10px;font-size:15px;background:#F4A820;color:#1a1a2e;border:none;border-radius:8px;cursor:pointer;font-weight:700}
   #start-btn:hover{background:#d4920a}
 
-  /* Modal */
-  #modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:none;align-items:center;justify-content:center;z-index:300}
+  #modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);display:none;align-items:center;justify-content:center;z-index:300}
   #modal.show{display:flex}
-  #modal-box{background:#16213e;border-radius:16px;padding:24px;max-width:340px;width:92%;text-align:center;border:2px solid #F4A820;box-shadow:0 8px 32px rgba(0,0,0,0.6)}
-  #modal-title{font-size:16px;font-weight:700;margin-bottom:10px;color:#F4A820}
-  #modal-body{font-size:13px;color:#ccc;margin-bottom:18px;line-height:1.6;white-space:pre-line}
-  #modal-btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
-  #modal-btns button{font-size:13px;padding:8px 16px}
+  #modal-box{background:#16213e;border-radius:16px;padding:24px;max-width:440px;width:92%;text-align:center;border:2px solid #F4A820;box-shadow:0 8px 32px rgba(0,0,0,0.6)}
+  #modal-title{font-size:18px;font-weight:700;margin-bottom:12px;color:#F4A820}
+  #modal-body{font-size:14px;color:#ddd;margin-bottom:20px;line-height:1.6}
+  #quiz-options{display:flex;flex-direction:column;gap:10px;margin:15px 0 10px}
+  .quiz-opt-btn{background:#0f0f23;border:1.5px solid #F4A820;border-radius:30px;padding:10px 12px;font-size:13px;text-align:left;display:flex;align-items:center;gap:12px;cursor:pointer;transition:0.1s;color:#fff}
+  .quiz-opt-btn:hover{background:#F4A820;color:#1a1a2e;border-color:#fff}
+  .opt-prefix{font-weight:800;font-size:16px;min-width:32px}
+  #modal-btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px}
   #turn-label{color:#F4A820;font-size:13px;font-weight:600}
+  .loading{text-align:center;color:#F4A820;padding:20px}
+
+  /* Result reveal animation */
+  .result-overlay {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
+    background: rgba(0,0,0,0.9);
+    backdrop-filter: blur(8px);
+    border-radius: 60px;
+    padding: 20px 40px;
+    text-align: center;
+    z-index: 400;
+    opacity: 0;
+    transition: all 0.25s ease;
+    pointer-events: none;
+    border: 3px solid gold;
+    box-shadow: 0 0 30px rgba(244,168,32,0.6);
+  }
+  .result-overlay.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+    pointer-events: auto;
+  }
+  .result-correct { background: #1e4620; border-color: #2ecc71; }
+  .result-wrong { background: #5c1a1a; border-color: #e74c3c; }
+  .result-emoji { font-size: 48px; display: block; margin-bottom: 8px; }
+  .result-text { font-size: 28px; font-weight: bold; letter-spacing: 2px; }
+  .result-points { font-size: 18px; margin-top: 8px; color: #F4A820; }
 </style>
 </head>
 <body>
 
 <h1>🎨 Seni Eksplorer</h1>
 
-<div id="setup">
-  <h2>Tetapan Permainan</h2>
+<div id="loading-message" class="loading">Memuatkan data permainan...</div>
+
+<div id="setup" style="display:none">
+  <h2>⚙️ Tetapan Permainan</h2>
   <div class="setup-row">
     <label>Bilangan pemain:</label>
     <select id="num-players">
@@ -76,20 +155,26 @@
     </select>
   </div>
   <div id="name-inputs"></div>
-  <button id="start-btn" onclick="startGame()">Mulakan Permainan 🎲</button>
+  <button id="start-btn">Mulakan Permainan 🎲</button>
 </div>
 
 <div id="game-area" style="display:none;flex-direction:column;align-items:center;gap:12px;width:100%">
   <div id="board-wrap">
-    <img id="board-img" src="Copy_of_inovasi_2026.png" alt="Seni Eksplorer Board"/>
+    <img id="board-img" src="Copy_of_inovasi_2026.png" alt="Seni Eksplorer Board" onerror="this.src='https://placehold.co/800x800/2c3e50/F4A820?text=Board+Seni'"/>
     <div id="cells-layer"></div>
     <div id="tokens-layer"></div>
   </div>
   <div id="players-row"></div>
   <div id="controls">
-    <div id="dice-display">🎲</div>
-    <button id="roll-btn" onclick="rollDice()">Buang Dadu</button>
-    <button onclick="endTurn()" id="end-btn" style="display:none">Tamat Giliran</button>
+    <div id="dice-display">
+      <div class="die" id="die">
+        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      </div>
+    </div>
+    <button id="roll-btn">Buang Dadu</button>
+    <button id="end-btn" style="display:none">Tamat Giliran</button>
     <span id="turn-label"></span>
   </div>
   <div id="log-wrap"><div id="log"></div></div>
@@ -103,239 +188,398 @@
   </div>
 </div>
 
+<div id="result-overlay" class="result-overlay">
+  <span id="result-emoji" class="result-emoji">🎉</span>
+  <div id="result-text" class="result-text"></div>
+  <div id="result-points" class="result-points"></div>
+</div>
+
 <script>
-// Space center positions as % [left%, top%] mapped to the board image
-// Board corners ~4.2%, spacing ~8.3% per cell
-// Clockwise: 0=MULA(bottom-right), 1-9 bottom L, 10=jail(bottom-left),
-// 11-19 left col up, 20=top-left, 21-28 top row R, 29=top-right, 30-36 right col down
-const SPACE_POS = [
-  [95.8,95.8], // 0 MULA
-  [87.5,95.8],[79.2,95.8],[70.9,95.8],[62.6,95.8],[54.3,95.8],[46.0,95.8],[37.7,95.8],[29.4,95.8],[21.1,95.8], // 1-9
-  [4.2,95.8],  // 10 JAIL
-  [4.2,87.5],[4.2,79.2],[4.2,70.9],[4.2,62.6],[4.2,54.3],[4.2,46.0],[4.2,37.7],[4.2,29.4],[4.2,21.1], // 11-19
-  [4.2,4.2],   // 20 FREE PARK
-  [12.5,4.2],[20.8,4.2],[29.1,4.2],[37.4,4.2],[45.7,4.2],[54.0,4.2],[62.3,4.2],[70.6,4.2], // 21-28
-  [95.8,4.2],  // 29 corner
-  [95.8,12.5],[95.8,20.8],[95.8,29.1],[95.8,37.4],[95.8,45.7],[95.8,54.0],[95.8,62.3], // 30-36
-];
+// Global variables
+let SPACE_POS = [];
+let SPACES = [];
+let QUIZ_BANK = {};
+let players = [], currentPlayer = 0, rolled = false;
+const COLORS = ['#E74C3C','#3498DB','#2ECC71','#9B59B6'];
+const EMOJIS = ['🎨','🖌️','✏️','🖼️'];
 
-const SPACES = [
-  {id:0,type:'corner',label:'MULA / START'},
-  {id:1,label:'Unsur seni manakah paling menonjol?',pts:1,cost:5},
-  {id:2,label:'Garisan ini menunjukkan pergerakan apa?',pts:3,cost:8},
-  {id:3,label:'Lukiskan rumah menggunakan bentuk geometri',pts:1,cost:6},
-  {id:4,label:'Nyatakan 3 jenis garisan',pts:3,cost:7},
-  {id:5,label:'Lukiskan rupa organik',pts:1,cost:6},
-  {id:6,label:'Rupa ini organik atau geometri?',pts:3,cost:9},
-  {id:7,label:'Lukiskan bentuk 2D',pts:5,cost:12},
-  {id:8,label:'Nyatakan warna sekunder',pts:3,cost:8},
-  {id:9,label:'Apakah jenis warna dalam poster?',pts:1,cost:5},
-  {id:10,type:'corner',label:'GO TO JAIL 🚔'},
-  {id:11,label:'Lukiskan bunga simetri seimbang',pts:1,cost:6},
-  {id:12,label:'Apakah warna yang digunakan?',pts:3,cost:8},
-  {id:13,label:'Lukiskan corak berulang',pts:1,cost:6},
-  {id:14,label:'Apakah jenis corak? Berikan 3 contoh.',pts:3,cost:9},
-  {id:15,label:'Perkenalkan berapa warna dalam karya?',pts:3,cost:8},
-  {id:16,label:'Ada berapa jenis warna?',pts:1,cost:5},
-  {id:17,label:'Lukiskan menggunakan bayangan imbangan simetri',pts:1,cost:7},
-  {id:18,label:'Apakah sudut yang terdapat?',pts:3,cost:8},
-  {id:19,label:'Nyatakan sudut yang terdapat dalam lukisan',pts:3,cost:9},
-  {id:20,type:'corner',label:'FREE PARKING 🅿️'},
-  {id:21,label:'Riang terhibur, kepada berapa jenis?',pts:3,cost:8},
-  {id:22,label:'Lukiskan dua jenis garisan berbeza',pts:3,cost:10},
-  {id:23,label:'Lukiskan bentuk 2D ilusi 3D',pts:3,cost:10},
-  {id:24,label:'Nyatakan itu warna panas?',pts:1,cost:5},
-  {id:25,label:'Apakah hasil warna campuran ini dan biru?',pts:3,cost:9},
-  {id:26,label:'Apakah unsur seni yang digunakan?',pts:1,cost:5},
-  {id:27,label:'Nyatakan itu warna sejuk',pts:3,cost:8},
-  {id:28,label:'Lukiskan jalan raya yang semakin kecil ke belakang',pts:3,cost:12},
-  {id:29,type:'corner',label:'PENJARA PULA 🔒'},
-  {id:30,label:'Prinsip rekaan — keseimbangan',pts:3,cost:9},
-  {id:31,label:'Lukiskan objek yang menunjukkan pergerakan',pts:3,cost:11},
-  {id:32,label:'Lukiskan objek tidak simetri',pts:1,cost:7},
-  {id:33,label:'Apakah yang paling harmoni?',pts:3,cost:9},
-  {id:34,label:'Nyatakan apa ciri kontras',pts:1,cost:5},
-  {id:35,label:'Lukiskan sesuatu yang menjadi penegasan',pts:1,cost:8},
-  {id:36,label:'Adakah tinjau penggunaan dalam poster?',pts:3,cost:9},
-];
+// Die dot patterns (1-indexed positions, 1-9)
+const DIE_PATTERNS = {
+  1: [5],
+  2: [3, 7],
+  3: [3, 5, 7],
+  4: [1, 3, 7, 9],
+  5: [1, 3, 5, 7, 9],
+  6: [1, 3, 4, 6, 7, 9]
+};
 
-const COLORS=['#E74C3C','#3498DB','#2ECC71','#9B59B6'];
-const EMOJIS=['🎨','🖌️','✏️','🖼️'];
-let players=[], currentPlayer=0, rolled=false;
-
-function buildNameInputs(){
-  const n=parseInt(document.getElementById('num-players').value);
-  const d=document.getElementById('name-inputs'); d.innerHTML='';
-  for(let i=0;i<n;i++)
-    d.innerHTML+=`<div class="setup-row"><label>${EMOJIS[i]} Pemain ${i+1}:</label><input id="pname${i}" type="text" value="Pemain ${i+1}"></div>`;
-}
-document.getElementById('num-players').addEventListener('change',buildNameInputs);
-buildNameInputs();
-
-function startGame(){
-  const n=parseInt(document.getElementById('num-players').value);
-  players=[];
-  for(let i=0;i<n;i++){
-    const name=document.getElementById('pname'+i).value||`Pemain ${i+1}`;
-    players.push({name,pos:0,score:20,color:COLORS[i],emoji:EMOJIS[i],owned:[]});
+function updateDieFace(value) {
+  const dots = document.querySelectorAll('#die .dot');
+  dots.forEach(dot => dot.classList.remove('lit'));
+  const positions = DIE_PATTERNS[value];
+  if (positions) {
+    positions.forEach(pos => {
+      if (dots[pos-1]) dots[pos-1].classList.add('lit');
+    });
   }
-  document.getElementById('setup').style.display='none';
-  const ga=document.getElementById('game-area');
-  ga.style.display='flex';
+}
+
+// Animated roll: rapidly change faces, then final number
+async function animateRoll(finalValue) {
+  const rollBtn = document.getElementById('roll-btn');
+  rollBtn.disabled = true;
+  const diceContainer = document.getElementById('dice-display');
+  diceContainer.classList.add('rolling');
+  
+  // Number of face changes during animation (16 changes over ~0.5 seconds)
+  const steps = 16;
+  const interval = 25; // ms
+  for (let i = 0; i <= steps; i++) {
+    if (i === steps) {
+      // Final face
+      updateDieFace(finalValue);
+    } else {
+      // Random face between 1-6
+      const randomFace = Math.floor(Math.random() * 6) + 1;
+      updateDieFace(randomFace);
+    }
+    await new Promise(r => setTimeout(r, interval));
+  }
+  
+  // Remove animation class after a short delay
+  setTimeout(() => {
+    diceContainer.classList.remove('rolling');
+    rollBtn.disabled = false;
+  }, 100);
+}
+
+function buildNameInputs() {
+  const numSelect = document.getElementById('num-players');
+  if (!numSelect) return;
+  const n = parseInt(numSelect.value);
+  const container = document.getElementById('name-inputs');
+  if (!container) return;
+  container.innerHTML = '';
+  for (let i = 0; i < n; i++) {
+    container.innerHTML += `<div class="setup-row"><label>${EMOJIS[i]} Pemain ${i+1}:</label><input id="pname${i}" type="text" value="Pemain ${i+1}"></div>`;
+  }
+}
+
+async function loadGameData() {
+  try {
+    const response = await fetch('game-data.yaml');
+    if (!response.ok) throw new Error(`HTTP ${response.status}: fail game-data.yaml tidak dijumpai`);
+    const yamlText = await response.text();
+    const data = jsyaml.load(yamlText);
+    SPACE_POS = data.space_positions;
+    SPACES = data.board_spaces;
+    QUIZ_BANK = data.quiz_bank;
+    if (!SPACE_POS || !SPACES || !QUIZ_BANK) throw new Error('Data YAML tidak lengkap');
+    
+    document.getElementById('loading-message').style.display = 'none';
+    const setupDiv = document.getElementById('setup');
+    setupDiv.style.display = 'block';
+    buildNameInputs();
+  } catch (err) {
+    document.getElementById('loading-message').innerHTML = `❌ Ralat: ${err.message}<br>Pastikan fail <strong>game-data.yaml</strong> berada di folder yang sama.`;
+    console.error(err);
+  }
+}
+
+function startGame() {
+  const numSelect = document.getElementById('num-players');
+  if (!numSelect) return;
+  const n = parseInt(numSelect.value);
+  players = [];
+  for (let i = 0; i < n; i++) {
+    const nameInput = document.getElementById('pname' + i);
+    const name = nameInput ? nameInput.value : `Pemain ${i+1}`;
+    players.push({name, pos: 0, score: 0, color: COLORS[i], emoji: EMOJIS[i], jailed: false});
+  }
+  document.getElementById('setup').style.display = 'none';
+  const gameArea = document.getElementById('game-area');
+  gameArea.style.display = 'flex';
   buildCells();
   renderTokens();
   renderPlayers();
   updateTurnLabel();
+  addLog("🎉 Permainan bermula! Giliran pertama.");
+  rolled = false;
+  document.getElementById('end-btn').style.display = 'none';
+  updateDieFace(1);
 }
 
-function buildCells(){
-  const layer=document.getElementById('cells-layer');
-  layer.innerHTML='';
-  SPACE_POS.forEach(([lp,tp],idx)=>{
-    const sp=SPACES[idx]; if(!sp) return;
-    const isCorner=sp.type==='corner';
-    const size=isCorner?8.0:7.2;
-    const el=document.createElement('div');
-    el.className='cell-hit'; el.id='cell-'+idx;
-    el.style.cssText=`left:${lp-size/2}%;top:${tp-size/2}%;width:${size}%;height:${size}%;`;
-    el.title=sp.label;
-    el.onclick=()=>onCellClick(idx);
+function buildCells() {
+  const layer = document.getElementById('cells-layer');
+  layer.innerHTML = '';
+  SPACE_POS.forEach(([lp, tp], idx) => {
+    const sp = SPACES[idx];
+    if (!sp) return;
+    const isCorner = sp.type === 'corner';
+    const w = isCorner ? 13.3 : 7.1;
+    const h = isCorner ? 13.3 : 7.1;
+    const el = document.createElement('div');
+    el.className = 'cell-hit';
+    el.id = 'cell-' + idx;
+    el.style.cssText = `left:${lp - w/2}%;top:${tp - h/2}%;width:${w}%;height:${h}%;`;
+    el.title = sp.label;
+    el.onclick = () => onCellClick(idx);
     layer.appendChild(el);
   });
 }
 
-function onCellClick(idx){
-  const sp=SPACES[idx]; if(!sp) return;
-  const owner=players.find(p=>p.owned.includes(idx));
-  let body=sp.label||'';
-  if(sp.pts) body+=`\n\nNilai: ${sp.pts} mata | Harga: ${sp.cost} syiling`;
-  if(owner) body+=`\n\nDimiliki: ${owner.emoji} ${owner.name}`;
-  showModal('Ruang '+idx+(sp.type==='corner'?' — '+sp.label:''), body,[{label:'Tutup',fn:closeModal}]);
+function onCellClick(idx) {
+  const sp = SPACES[idx];
+  if (!sp) return;
+  showModal('INFO Ruang ' + idx, sp.label || 'Tiada keterangan', [{label:'Tutup', fn: closeModal}]);
 }
 
-function rollDice(){
-  if(rolled) return;
-  rolled=true;
-  const d1=Math.floor(Math.random()*6)+1, d2=Math.floor(Math.random()*6)+1;
-  const total=d1+d2;
-  const de=['','⚀','⚁','⚂','⚃','⚄','⚅'];
-  document.getElementById('dice-display').textContent=de[d1]+de[d2];
-  const p=players[currentPlayer];
-  const prev=p.pos;
-  p.pos=(p.pos+total)%SPACES.length;
-  if(p.pos<prev&&prev!==0){p.score+=5; addLog(`${p.emoji} Lepas MULA! +5 mata`);}
-  addLog(`${p.emoji} ${p.name}: ${d1}+${d2}=${total} → Ruang ${p.pos}`);
-  renderTokens(); highlightCell(p.pos);
-  document.getElementById('end-btn').style.display='inline-block';
-  setTimeout(()=>handleLanding(p,SPACES[p.pos]),600);
+function playBeep(isCorrect) {
+  try {
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+    oscillator.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    oscillator.type = 'sine';
+    oscillator.frequency.value = isCorrect ? 880 : 440;
+    gainNode.gain.value = 0.2;
+    oscillator.start();
+    gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.5);
+    oscillator.stop(audioCtx.currentTime + 0.5);
+    audioCtx.resume().catch(e => console.log("Audio not allowed"));
+  } catch(e) { /* silent fallback */ }
 }
 
-function handleLanding(p,sp){
-  if(!sp||sp.type==='corner') return;
-  if(sp.id===10){
-    showModal('GO TO JAIL! 🚔',`${p.emoji} ${p.name} dihantar ke penjara!\nKembali ke ruang 10.`,[{label:'OK',fn:closeModal}]);
+function showResult(isCorrect, pointsEarned, correctAnswerLetter, correctAnswerText) {
+  const overlay = document.getElementById('result-overlay');
+  const emojiSpan = document.getElementById('result-emoji');
+  const textDiv = document.getElementById('result-text');
+  const pointsDiv = document.getElementById('result-points');
+  
+  if (isCorrect) {
+    overlay.classList.add('result-correct');
+    overlay.classList.remove('result-wrong');
+    emojiSpan.textContent = '✅🎉';
+    textDiv.textContent = `BETUL!`;
+    pointsDiv.textContent = `+${pointsEarned} mata`;
+  } else {
+    overlay.classList.add('result-wrong');
+    overlay.classList.remove('result-correct');
+    emojiSpan.textContent = '❌😢';
+    textDiv.textContent = `SALAH!`;
+    pointsDiv.textContent = `Jawapan betul: ${correctAnswerLetter}. ${correctAnswerText}`;
+  }
+  
+  overlay.classList.add('show');
+  setTimeout(() => overlay.classList.remove('show'), 1800);
+}
+
+async function rollDice() {
+  if (rolled) { addLog("⏳ Anda sudah buang dadu! Selesaikan giliran."); return; }
+  const curr = players[currentPlayer];
+  if (curr.jailed) {
+    showModal("🚔 DI PENJARA!", `${curr.emoji} ${curr.name} masih dipenjarakan. Giliran dilangkau!`, [{
+      label: "OK", fn: () => {
+        closeModal();
+        addLog(`⛓️ ${curr.name} dalam penjara, langkau giliran.`);
+        curr.jailed = false;
+        endTurn();
+      }
+    }]);
     return;
   }
-  const owner=players.find(o=>o.owned.includes(sp.id)&&o!==p);
-  if(owner){
-    const rent=Math.ceil(sp.cost/2);
-    p.score=Math.max(0,p.score-rent); owner.score+=rent;
-    addLog(`${p.emoji} bayar sewa ${rent} mata → ${owner.emoji}`);
-    showModal('Bayar Sewa! 💸',`Ruang ${sp.id} dimiliki ${owner.emoji} ${owner.name}\n\nBayar ${rent} mata sewa.`,
-      [{label:'OK',fn:()=>{closeModal();renderPlayers();}}]);
+  
+  // Generate final die value
+  const dieValue = Math.floor(Math.random() * 6) + 1;
+  
+  // Play animated roll
+  await animateRoll(dieValue);
+  
+  // Now apply game logic
+  rolled = true;
+  const p = players[currentPlayer];
+  const prev = p.pos;
+  p.pos = (p.pos + dieValue) % SPACES.length;
+  if (p.pos < prev && prev !== 0) { p.score += 5; addLog(`${p.emoji} Melepasi petak MULA! +5 mata`); }
+  addLog(`${p.emoji} ${p.name}: Dadu menunjukkan ${dieValue} → gerak ke ruang ${p.pos} (${SPACES[p.pos].label})`);
+  renderTokens();
+  highlightCell(p.pos);
+  document.getElementById('end-btn').style.display = 'inline-block';
+  setTimeout(() => handleLanding(p, SPACES[p.pos]), 500);
+}
+
+function handleLanding(p, sp) {
+  if (!sp) return;
+  if (sp.type === 'corner') {
+    if (sp.id === 10) {
+      showModal("🚔 GO TO JAIL", `${p.emoji} ${p.name} ditangkap! Anda dipenjarakan dan akan kehilangan giliran seterusnya.`, [{
+        label: "Okay...", fn: () => {
+          p.jailed = true;
+          closeModal();
+          addLog(`${p.name} dipenjarakan!`);
+          renderPlayers();
+        }
+      }]);
+    } else {
+      addLog(`${p.name} tiba di ${sp.label}. Tiada kuiz.`);
+    }
     return;
   }
-  if(p.owned.includes(sp.id)){addLog(`${p.emoji} tanah sendiri, selamat!`);return;}
-  const canBuy=p.score>=sp.cost;
-  showModal(`Ruang ${sp.id} — Cabaran Seni! 🎨`,
-    `"${sp.label}"\n\n${canBuy?`Beli untuk ${sp.cost} syiling & dapat ${sp.pts} mata sewa?\nKamu ada ${p.score} mata.`:`Kos ${sp.cost} syiling (kamu ada ${p.score}). Jawab cabaran untuk dapat ${sp.pts} mata!`}`,
-    canBuy?[
-      {label:`🏠 Beli (${sp.cost}🪙)`,fn:()=>{p.owned.push(sp.id);p.score-=sp.cost;p.score+=sp.pts;addLog(`${p.emoji} beli Ruang ${sp.id} +${sp.pts}pts`);markOwned(sp.id,p.color);renderPlayers();closeModal();}},
-      {label:`✏️ Jawab (+${sp.pts}⭐)`,fn:()=>{p.score+=sp.pts;addLog(`${p.emoji} jawab cabaran +${sp.pts}pts`);renderPlayers();closeModal();}}
-    ]:[
-      {label:`✏️ Jawab Cabaran (+${sp.pts}⭐)`,fn:()=>{p.score+=sp.pts;addLog(`${p.emoji} jawab cabaran +${sp.pts}pts`);renderPlayers();closeModal();}}
-    ]
-  );
+  const quiz = QUIZ_BANK[sp.id];
+  if (!quiz) {
+    addLog(`Ruang ${sp.id} tiada data kuiz, tiada mata.`);
+    return;
+  }
+  const pts = sp.pts || 1;
+  const letters = ['A', 'B', 'C', 'D'];
+  const modalBody = `
+    <div style="font-weight:bold; margin-bottom:10px; color:#F4A820;">🎨 ${quiz.soalan}</div>
+    <div style="font-size:12px; margin-bottom:8px;">⭐ Nilai: ${pts} mata (pilih jawapan)</div>
+    <div id="quiz-options"></div>
+  `;
+  document.getElementById('modal-title').innerHTML = `📝 Cabaran Seni — Ruang ${sp.id}`;
+  document.getElementById('modal-body').innerHTML = modalBody;
+  const btnsDiv = document.getElementById('modal-btns');
+  btnsDiv.innerHTML = '';
+  const optionsContainer = document.getElementById('quiz-options');
+  optionsContainer.innerHTML = '';
+  
+  quiz.pilihan.forEach((opt, idx) => {
+    const btn = document.createElement('div');
+    btn.className = 'quiz-opt-btn';
+    btn.innerHTML = `<span class="opt-prefix">${letters[idx]}</span> <span>${opt}</span>`;
+    btn.onclick = () => {
+      const isCorrect = (idx === quiz.jawapan);
+      const correctLetter = letters[quiz.jawapan];
+      const correctText = quiz.pilihan[quiz.jawapan];
+      
+      if (isCorrect) {
+        p.score += pts;
+        addLog(`✅ ${p.emoji} ${p.name} menjawab BETUL! +${pts} mata. (Jawapan: ${letters[idx]})`);
+        playBeep(true);
+      } else {
+        addLog(`❌ ${p.emoji} ${p.name} menjawab SALAH. Jawapan betul: ${correctLetter}. ${correctText}. Tiada mata.`);
+        playBeep(false);
+      }
+      renderPlayers();
+      closeModal();
+      showResult(isCorrect, pts, correctLetter, correctText);
+    };
+    optionsContainer.appendChild(btn);
+  });
+  const cancelBtn = document.createElement('button');
+  cancelBtn.textContent = 'Batal / Skip (tiada mata)';
+  cancelBtn.style.backgroundColor = '#444';
+  cancelBtn.onclick = () => {
+    addLog(`${p.emoji} ${p.name} memilih untuk tidak menjawab. Tiada mata.`);
+    closeModal();
+  };
+  btnsDiv.appendChild(cancelBtn);
+  document.getElementById('modal').classList.add('show');
 }
 
-function markOwned(id,color){
-  const el=document.getElementById('cell-'+id);
-  if(el){el.style.setProperty('--oc',color);el.classList.add('owned');}
-}
-
-function endTurn(){
-  rolled=false;
-  document.getElementById('dice-display').textContent='🎲';
-  document.getElementById('end-btn').style.display='none';
+function endTurn() {
+  if (!rolled) {
+    addLog("Anda belum buang dadu! Klik 'Buang Dadu' dahulu.");
+    return;
+  }
+  rolled = false;
+  updateDieFace(1);
+  document.getElementById('end-btn').style.display = 'none';
   clearHighlight();
-  currentPlayer=(currentPlayer+1)%players.length;
-  updateTurnLabel(); renderPlayers(); checkWinner();
+  currentPlayer = (currentPlayer + 1) % players.length;
+  updateTurnLabel();
+  renderPlayers();
+  checkWinner();
+  addLog(`🔄 Giliran bertukar kepada ${players[currentPlayer].emoji} ${players[currentPlayer].name}`);
 }
 
-function checkWinner(){
-  const w=players.find(p=>p.score>=60);
-  if(w) showModal('🏆 Tahniah!',`${w.emoji} ${w.name} menang dengan ${w.score} mata!`,[{label:'Syabas!',fn:closeModal}]);
+function checkWinner() {
+  const winner = players.find(p => p.score >= 30);
+  if (winner) {
+    showModal('🏆 TAHNIAH!', `${winner.emoji} ${winner.name} menang dengan ${winner.score} mata! 🎉`, [{label: 'Hebat!', fn: () => location.reload()}]);
+  }
 }
 
-function highlightCell(id){
-  document.querySelectorAll('.cell-hit.highlight').forEach(c=>c.classList.remove('highlight'));
-  const el=document.getElementById('cell-'+id); if(el) el.classList.add('highlight');
+function highlightCell(id) {
+  document.querySelectorAll('.cell-hit.highlight').forEach(c => c.classList.remove('highlight'));
+  const el = document.getElementById('cell-' + id);
+  if (el) el.classList.add('highlight');
 }
-function clearHighlight(){document.querySelectorAll('.cell-hit.highlight').forEach(c=>c.classList.remove('highlight'));}
+function clearHighlight() { document.querySelectorAll('.cell-hit.highlight').forEach(c => c.classList.remove('highlight')); }
 
-function renderTokens(){
-  const layer=document.getElementById('tokens-layer'); layer.innerHTML='';
-  players.forEach((p,i)=>{
-    const [lp,tp]=SPACE_POS[p.pos]||[50,50];
-    const offsets=[[0,0],[3,0],[0,3],[3,3]];
-    const [ox,oy]=offsets[i];
-    const el=document.createElement('div');
-    el.className='ptoken';
-    el.style.left=(lp+ox*0.5)+'%';
-    el.style.top=(tp+oy*0.5)+'%';
-    el.style.background=p.color;
-    el.textContent=p.emoji;
+function renderTokens() {
+  const layer = document.getElementById('tokens-layer');
+  layer.innerHTML = '';
+  players.forEach((p, i) => {
+    const [lp, tp] = SPACE_POS[p.pos] || [50, 50];
+    const offsets = [[0,0], [3.5,0], [0,3.5], [3.5,3.5]];
+    const [ox, oy] = offsets[i % 4];
+    const el = document.createElement('div');
+    el.className = 'ptoken';
+    el.style.left = (lp + ox * 0.8) + '%';
+    el.style.top = (tp + oy * 0.8) + '%';
+    el.style.background = p.color;
+    el.textContent = p.emoji;
     layer.appendChild(el);
   });
 }
 
-function renderPlayers(){
-  document.getElementById('players-row').innerHTML=players.map((p,i)=>
-    `<div class="player-card${i===currentPlayer?' active':''}">
+function renderPlayers() {
+  const container = document.getElementById('players-row');
+  if (!container) return;
+  container.innerHTML = players.map((p, i) =>
+    `<div class="player-card${i === currentPlayer ? ' active' : ''}">
       <div class="token-badge" style="background:${p.color}">${p.emoji}</div>
       <div>
-        <div class="player-name">${p.name}</div>
-        <div class="player-score">⭐ ${p.score} mata · 🏠 ${p.owned.length}</div>
+        <div class="player-name">${p.name} ${p.jailed ? '🚫' : ''}</div>
+        <div class="player-score">⭐ ${p.score} mata</div>
       </div>
-    </div>`).join('');
+    </div>`
+  ).join('');
 }
 
-function updateTurnLabel(){
-  const p=players[currentPlayer];
-  document.getElementById('turn-label').textContent=`Giliran: ${p.emoji} ${p.name}`;
+function updateTurnLabel() {
+  const p = players[currentPlayer];
+  const label = document.getElementById('turn-label');
+  if (label) label.textContent = `Giliran: ${p.emoji} ${p.name} ${p.jailed ? '(Dipenjara seterusnya)' : ''}`;
 }
 
-function addLog(msg){
-  const log=document.getElementById('log');
-  log.innerHTML+=`<div>› ${msg}</div>`;
-  log.parentElement.scrollTop=log.parentElement.scrollHeight;
+function addLog(msg) {
+  const logDiv = document.getElementById('log');
+  if (logDiv) {
+    logDiv.innerHTML += `<div>› ${msg}</div>`;
+    logDiv.parentElement.scrollTop = logDiv.parentElement.scrollHeight;
+  }
 }
 
-function showModal(title,body,btns){
-  document.getElementById('modal-title').textContent=title;
-  document.getElementById('modal-body').textContent=body;
-  const bc=document.getElementById('modal-btns');
-  bc.innerHTML='';
-  (btns||[{label:'OK',fn:closeModal}]).forEach((b,i)=>{
-    const btn=document.createElement('button');
-    btn.textContent=b.label;
-    if(i===0) btn.style.cssText='background:#F4A820;color:#1a1a2e;border-color:#F4A820';
-    btn.onclick=b.fn;
+function showModal(title, body, btns) {
+  document.getElementById('modal-title').textContent = title;
+  const mb = document.getElementById('modal-body');
+  if (typeof body === 'string') mb.innerHTML = body.replace(/\n/g, '<br>');
+  else mb.innerHTML = body;
+  const bc = document.getElementById('modal-btns');
+  bc.innerHTML = '';
+  (btns || [{label: 'Tutup', fn: closeModal}]).forEach((b, i) => {
+    const btn = document.createElement('button');
+    btn.textContent = b.label;
+    if (i === 0) btn.style.cssText = 'background:#F4A820;color:#1a1a2e;border-color:#F4A820';
+    btn.onclick = b.fn;
     bc.appendChild(btn);
   });
   document.getElementById('modal').classList.add('show');
 }
-function closeModal(){document.getElementById('modal').classList.remove('show');}
+function closeModal() { document.getElementById('modal').classList.remove('show'); }
+
+// Event listeners
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('num-players')?.addEventListener('change', buildNameInputs);
+  document.getElementById('start-btn')?.addEventListener('click', startGame);
+  document.getElementById('roll-btn')?.addEventListener('click', rollDice);
+  document.getElementById('end-btn')?.addEventListener('click', endTurn);
+  loadGameData();
+});
 </script>
 </body>
 </html>
