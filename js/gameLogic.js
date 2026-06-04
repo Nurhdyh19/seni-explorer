@@ -251,33 +251,36 @@ function startGame() {
 }
 
 function returnToHome() {
+    // Cancel any ongoing game activity
     cancelMovement();
     closeModal();
-    const resultOverlay = document.getElementById('result-overlay');
-    if (resultOverlay) resultOverlay.classList.remove('show');
     
+    // Reset game state variables
     gameActive = false;
     rolled = false;
     isMoving = false;
-    currentPlayer = 0;
     players = [];
+    currentPlayer = 0;
     
+    // Hide game area and setup panel
     document.getElementById('game-area').style.display = 'none';
-    document.getElementById('setup').style.display = 'block';
+    document.getElementById('setup').style.display = 'none';
     
-    const logDiv = document.getElementById('log');
-    if (logDiv) logDiv.innerHTML = '';
+    // Show splash screen and remove hidden class
+    const splash = document.getElementById('splash-screen');
+    splash.style.display = 'flex';
+    splash.classList.remove('splash-hidden');
     
-    const turnLabel = document.getElementById('turn-label');
-    if (turnLabel) turnLabel.textContent = '';
-    
-    buildNameInputs();
-    updateDieFace(1);
-    attachHoverSounds();
-    
+    // After splash animation, hide splash and show setup again
     setTimeout(() => {
-        resetMovementFlag();
-    }, 100);
+        splash.classList.add('splash-hidden');
+        setTimeout(() => {
+            splash.style.display = 'none';
+            document.getElementById('setup').style.display = 'block';
+            buildNameInputs();      // Rebuild player name inputs
+            attachHoverSounds();
+        }, 800);
+    }, 1500);  // Show splash for 1.5 seconds before fading
     
     playSfx('click');
     addLog(t('log_cancel_return'));
