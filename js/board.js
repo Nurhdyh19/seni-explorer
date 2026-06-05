@@ -115,31 +115,42 @@ function closeModal() {
     document.getElementById('modal').classList.remove('show');
 }
 
-function showResult(isCorrect, pointsEarned, correctAnswerLetter, correctAnswerText, onClose, imageUrl = null) {
+function showResult(isCorrect, pointsEarned, correctAnswerLetter, correctAnswerText, onClose, imageUrl = null, question = null, choices = null, chosenIndex = -1, answerIndex = -1) {
     const overlay = document.getElementById('result-overlay');
     const emojiSpan = document.getElementById('result-emoji');
     const textDiv = document.getElementById('result-text');
+    const questionDiv = document.getElementById('result-question');
+    const choicesDiv = document.getElementById('result-choices');
     const pointsDiv = document.getElementById('result-points');
     const resultImg = document.getElementById('result-image');
     
     resultImg.style.display = 'none';
     resultImg.src = '';
+    choicesDiv.innerHTML = '';
+    questionDiv.textContent = question || '';
     
     if (isCorrect) {
-        overlay.classList.add('result-correct');
-        overlay.classList.remove('result-wrong');
         emojiSpan.textContent = '✅🎉';
         textDiv.textContent = t('result_correct_title');
-        pointsDiv.textContent = t('result_points_format', { points: pointsEarned });
         playSfx('correct');
     } else {
-        overlay.classList.add('result-wrong');
-        overlay.classList.remove('result-correct');
         emojiSpan.textContent = '❌😢';
         textDiv.textContent = t('result_wrong_title');
-        pointsDiv.textContent = correctAnswerLetter ? t('result_wrong_answer_format', { letter: correctAnswerLetter, text: correctAnswerText }) : t('result_no_points');
         playSfx('wrong');
     }
+    
+    if (choices) {
+        choices.forEach((choice, idx) => {
+            const div = document.createElement('div');
+            div.className = 'result-choice';
+            if (idx === answerIndex) div.classList.add('correct');
+            if (idx === chosenIndex && idx !== answerIndex) div.classList.add('wrong');
+            div.textContent = `${String.fromCharCode(65 + idx)}) ${choice}`;
+            choicesDiv.appendChild(div);
+        });
+    }
+    
+    pointsDiv.textContent = isCorrect ? t('result_points_format', { points: pointsEarned }) : t('result_wrong_answer_format', { letter: correctAnswerLetter, text: correctAnswerText });
     
     if (imageUrl && isCorrect) {
         resultImg.src = imageUrl;
@@ -148,19 +159,18 @@ function showResult(isCorrect, pointsEarned, correctAnswerLetter, correctAnswerT
     }
     
     overlay.classList.add('show');
+    
+    // Auto-close after 5 seconds
     let resultTimeoutId = setTimeout(() => {
         overlay.classList.remove('show');
         if (onClose) onClose();
-    }, 3000);
+    }, 5000);
     
-    // Allow skipping by clicking anywhere on the page (after a short delay to prevent immediate close)
-    setTimeout(() => {
-        const skipHandler = (e) => {
-            clearTimeout(resultTimeoutId);
-            overlay.classList.remove('show');
-            document.removeEventListener('click', skipHandler);
-            if (onClose) onClose();
-        };
-        document.addEventListener('click', skipHandler);
-    }, 100);
+    // Allow skipping by clicking anywhere on the page
+    overlay.onclick = () => {
+        clearTimeout(resultTimeoutId);
+        overlay.classList.remove('show');
+        overlay.onclick = null;
+        if (onClose) onClose();
+    };
 }

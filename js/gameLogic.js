@@ -118,7 +118,7 @@ function handleLanding(p, spaceIndex) {
                 }
                 renderPlayers();
                 closeModal();
-                showResult(isCorrect, pts, correctLetter, correctText, () => endTurn(), null);
+                showResult(isCorrect, pts, correctLetter, correctText, () => endTurn(), null, sp.label, choices, idx, answerIndex);
             };
             btn.addEventListener('mouseenter', () => playSfx('hover'));
             optionsContainer.appendChild(btn);
