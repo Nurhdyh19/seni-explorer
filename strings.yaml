@@ -10,7 +10,10 @@ nav_home: "🏠 Home"
 nav_restart: "🔄 Restart Game"
 nav_sound_on: "🔊 Sound ON"
 nav_sound_off: "🔇 Sound OFF"
+nav_music_on: "🎵 Music ON"
+nav_music_off: "🔇 Music OFF"
 nav_guide: "📖 Guide"
+nav_settings: "⚙️ Settings"
 
 # ---------- SETUP SCREEN ----------
 setup_title: "⚙️ Tetapan Permainan"
@@ -62,14 +65,19 @@ quiz_log_skip: "{emoji} {name} memilih untuk tidak menjawab. Tiada mata."
 result_correct_title: "BETUL!"
 result_wrong_title: "SALAH!"
 result_points_format: "+{points} mata"
+result_no_points: "Tiada mata diperoleh."
 result_wrong_answer_format: "Jawapan betul: {letter}. {text}"
 
 # ---------- LOG MESSAGES ----------
 log_lap_complete: "{emoji} {name} melengkapkan 1 pusingan! ({laps}/{target})"
 log_rolled_moved: "{emoji} {name}: Dadu {dice} → gerak ke ruang {spaceKey} ({spaceLabel})"
 log_jailed: "{name} dipenjarakan!"
+log_jailed_turn_skipped: "⛓️ {name} dalam penjara, langkau giliran."
 log_turn_change: "🔄 Giliran bertukar kepada {emoji} {name}"
 log_cancel_return: "🏠 Kembali ke menu utama."
+msg_game_ended: "Permainan telah berakhir."
+msg_wait_turn: "Tunggu giliran anda."
+msg_corner_no_quiz: "{name} mendarat di {label}. Tiada soalan di sini."
 
 # ---------- CORNER SPACES ----------
 corner_museum: "MUZIUM SENI 🏛️"
@@ -80,6 +88,8 @@ corner_start: "MULA / START"
 # ---------- PLAYER CARD ----------
 player_score_label: "⭐ {score} mata"
 player_laps_label: "🏁 {laps} / {target} pusingan"
+player_name_label: "{emoji} Pemain {number}"
+player_name_placeholder: "Pemain {number}"
 
 # ---------- GUIDE MODAL (plain text with bullet points) ----------
 # Use "- " at the beginning of a line to create a bullet.
@@ -102,12 +112,11 @@ guide_content: |
 
   Selamat bermain dan jadi peneroka seni terbaik! 🎨
 
-# ---------- PLAYER NAME INPUT ----------
-player_name_label: "{emoji} Pemain {number}:"
-player_name_placeholder: "Pemain {number}"
-
 # ---------- ADDITIONAL MESSAGES ----------
 msg_loading_error: "❌ Ralat: {error}<br>Pastikan fail <strong>game-data.yaml</strong> berada di folder yang sama."
-msg_game_ended: "Permainan sudah tamat. Muat semula halaman untuk main semula."
-msg_wait_turn: "⏳ Selesaikan giliran atau tunggu token bergerak."
-msg_corner_no_quiz: "{name} tiba di {label}. Tiada kuiz."
+msg_loading: "Memuatkan data permainan..."
+
+# ---------- SETTINGS PANEL ----------
+settings_title: "⚙️ Settings"
+settings_music_volume: "Volum Muzik:"
+settings_sfx_volume: "Volum Kesan Bunyi:"

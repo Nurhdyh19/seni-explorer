@@ -27,7 +27,7 @@ async function rollDice() {
             label: t('modal_ok_btn'), fn: () => {
                 playSfx('click');
                 closeModal();
-                addLog(`⛓️ ${curr.name} dalam penjara, langkau giliran.`);
+                addLog(t('log_jailed_turn_skipped', { name: curr.name }));
                 curr.jailed = false;
                 endTurn();
             }
@@ -320,7 +320,7 @@ function toggleBgm() {
     toggleBackgroundMusic();
     const musicBtn = document.getElementById('nav-music');
     if (musicBtn) {
-        musicBtn.innerHTML = bgmEnabled ? '🎵 Music ON' : '🔇 Music OFF';
+        musicBtn.textContent = bgmEnabled ? t('nav_music_on') : t('nav_music_off');
     }
     playSfx('click');
 }

@@ -137,7 +137,7 @@ function showResult(isCorrect, pointsEarned, correctAnswerLetter, correctAnswerT
         overlay.classList.remove('result-correct');
         emojiSpan.textContent = '❌😢';
         textDiv.textContent = t('result_wrong_title');
-        pointsDiv.textContent = correctAnswerLetter ? t('result_wrong_answer_format', { letter: correctAnswerLetter, text: correctAnswerText }) : `Tiada mata diperoleh.`;
+        pointsDiv.textContent = correctAnswerLetter ? t('result_wrong_answer_format', { letter: correctAnswerLetter, text: correctAnswerText }) : t('result_no_points');
         playSfx('wrong');
     }
     

@@ -82,6 +82,10 @@ async function loadLocalization() {
 }
 
 function applyLocalizationToUI() {
+    // Loading message
+    const loadingMsg = document.getElementById('loading-message');
+    if (loadingMsg) loadingMsg.textContent = t('msg_loading');
+    
     // Navigation buttons
     const homeBtn = document.getElementById('nav-home');
     if (homeBtn) homeBtn.textContent = t('nav_home');
@@ -89,6 +93,10 @@ function applyLocalizationToUI() {
     if (restartBtn) restartBtn.textContent = t('nav_restart');
     const soundBtn = document.getElementById('nav-sound');
     if (soundBtn) soundBtn.textContent = sfxEnabled ? t('nav_sound_on') : t('nav_sound_off');
+    const musicBtn = document.getElementById('nav-music');
+    if (musicBtn) musicBtn.textContent = bgmEnabled ? t('nav_music_on') : t('nav_music_off');
+    const settingsBtn = document.getElementById('nav-settings');
+    if (settingsBtn) settingsBtn.textContent = t('nav_settings');
     const guideBtn = document.getElementById('nav-guide');
     if (guideBtn) guideBtn.textContent = t('nav_guide');
     
@@ -133,6 +141,22 @@ function applyLocalizationToUI() {
     // Roll button
     const rollBtn = document.getElementById('roll-btn');
     if (rollBtn) rollBtn.textContent = t('roll_dice_btn');
+    
+    // Settings panel
+    const settingsTitle = document.querySelector('.settings-header h3');
+    if (settingsTitle) settingsTitle.textContent = t('settings_title');
+    
+    // Settings labels
+    const settingsLabels = document.querySelectorAll('.settings-row label');
+    settingsLabels.forEach((label, idx) => {
+        const span = label.querySelector('span');
+        const spanValue = span ? span.textContent : '';
+        if (idx === 0) {
+            label.innerHTML = t('settings_music_volume') + ' <span id="music-vol-display-modal">' + spanValue + '</span>%';
+        } else if (idx === 1) {
+            label.innerHTML = t('settings_sfx_volume') + ' <span id="sfx-vol-display-modal">' + spanValue + '</span>%';
+        }
+    });
     
     // Turn label if game already started
     if (players.length > 0 && currentPlayer < players.length) {
