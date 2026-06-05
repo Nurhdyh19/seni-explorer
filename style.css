@@ -608,7 +608,7 @@ input[type="text"],
 .result-question {
   font-size: 14px;
   color: #ddd;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
   line-height: 1.6;
 }
 
@@ -619,7 +619,7 @@ input[type="text"],
   margin: 15px 0 10px;
 }
 
-.result-choice {
+.result-opt-static {
   background: #0f0f23;
   border: 1.5px solid #F4A820;
   border-radius: 30px;
@@ -632,13 +632,13 @@ input[type="text"],
   color: #fff;
 }
 
-.result-choice.correct {
+.result-opt-static.correct {
   background: #2ecc71;
   border-color: #27ae60;
   animation: blink-green 1s infinite;
 }
 
-.result-choice.wrong {
+.result-opt-static.wrong {
   background: #e74c3c;
   border-color: #c0392b;
 }

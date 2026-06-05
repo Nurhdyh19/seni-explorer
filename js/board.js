@@ -142,10 +142,13 @@ function showResult(isCorrect, pointsEarned, correctAnswerLetter, correctAnswerT
     if (choices) {
         choices.forEach((choice, idx) => {
             const div = document.createElement('div');
-            div.className = 'result-choice';
+            div.className = 'result-opt-static';
+            
+            // Apply feedback classes
             if (idx === answerIndex) div.classList.add('correct');
             if (idx === chosenIndex && idx !== answerIndex) div.classList.add('wrong');
-            div.textContent = `${String.fromCharCode(65 + idx)}) ${choice}`;
+            
+            div.innerHTML = `<span class="opt-prefix">${String.fromCharCode(65 + idx)}</span> <span>${choice}</span>`;
             choicesDiv.appendChild(div);
         });
     }
