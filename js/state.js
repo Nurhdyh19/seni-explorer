@@ -22,10 +22,12 @@ let sfxVolume = 0.25;   // Default: 25% (higher than music)
 let uiText = {};
 let localizationLoaded = false;
 
-// Load volume settings from localStorage
+// Load settings from localStorage
 function loadVolumeSettings() {
     const savedMusicVolume = localStorage.getItem('seniExplorer_musicVolume');
     const savedSfxVolume = localStorage.getItem('seniExplorer_sfxVolume');
+    const savedSfxEnabled = localStorage.getItem('seniExplorer_sfxEnabled');
+    const savedBgmEnabled = localStorage.getItem('seniExplorer_bgmEnabled');
     
     if (savedMusicVolume !== null) {
         musicVolume = parseFloat(savedMusicVolume);
@@ -33,9 +35,15 @@ function loadVolumeSettings() {
     if (savedSfxVolume !== null) {
         sfxVolume = parseFloat(savedSfxVolume);
     }
+    if (savedSfxEnabled !== null) {
+        sfxEnabled = savedSfxEnabled === 'true';
+    }
+    if (savedBgmEnabled !== null) {
+        bgmEnabled = savedBgmEnabled === 'true';
+    }
 }
 
-// Save volume settings to localStorage
+// Save settings to localStorage
 function saveMusicVolume(volume) {
     musicVolume = Math.max(0, Math.min(1, volume));
     localStorage.setItem('seniExplorer_musicVolume', musicVolume);
@@ -48,6 +56,16 @@ function saveMusicVolume(volume) {
 function saveSfxVolume(volume) {
     sfxVolume = Math.max(0, Math.min(1, volume));
     localStorage.setItem('seniExplorer_sfxVolume', sfxVolume);
+}
+
+function saveSfxEnabled(enabled) {
+    sfxEnabled = enabled;
+    localStorage.setItem('seniExplorer_sfxEnabled', sfxEnabled);
+}
+
+function saveBgmEnabled(enabled) {
+    bgmEnabled = enabled;
+    localStorage.setItem('seniExplorer_bgmEnabled', bgmEnabled);
 }
 
 // Helper to reset movement flag

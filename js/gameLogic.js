@@ -308,7 +308,7 @@ function restartGame() {
 }
 
 function toggleSound() {
-    sfxEnabled = !sfxEnabled;
+    saveSfxEnabled(!sfxEnabled);
     const soundBtn = document.getElementById('nav-sound');
     if (soundBtn) {
         soundBtn.innerHTML = sfxEnabled ? t('nav_sound_on') : t('nav_sound_off');
@@ -318,6 +318,7 @@ function toggleSound() {
 
 function toggleBgm() {
     toggleBackgroundMusic();
+    saveBgmEnabled(bgmEnabled);
     const musicBtn = document.getElementById('nav-music');
     if (musicBtn) {
         musicBtn.textContent = bgmEnabled ? t('nav_music_on') : t('nav_music_off');
