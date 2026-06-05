@@ -20,8 +20,6 @@
 <div id="game-nav" class="game-nav">
   <button id="nav-home" class="nav-btn">🏠 Home</button>
   <button id="nav-restart" class="nav-btn">🔄 Restart Game</button>
-  <button id="nav-sound" class="nav-btn">🔊 Sound ON</button>
-  <button id="nav-music" class="nav-btn">🎵 Music ON</button>
   <button id="nav-install" class="nav-btn" style="display:none">⬇️ Pasang</button>
   <button id="nav-settings" class="nav-btn">⚙️ Settings</button>
   <button id="nav-guide" class="nav-btn">📖 Guide</button>
@@ -101,6 +99,10 @@
       <button id="settings-close" class="settings-close">&times;</button>
     </div>
     <div class="settings-body">
+      <div class="settings-row toggle-row">
+        <button id="nav-sound" class="nav-btn">🔊 Sound ON</button>
+        <button id="nav-music" class="nav-btn">🎵 Music ON</button>
+      </div>
       <div class="settings-row">
         <label>Volum Muzik: <span id="music-vol-display-modal">15</span>%</label>
         <input type="range" id="music-volume-slider-modal" min="0" max="100" value="15" class="volume-slider">

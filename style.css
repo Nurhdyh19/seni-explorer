@@ -732,6 +732,16 @@ input[type="text"],
   gap: 8px;
 }
 
+.settings-row.toggle-row {
+  flex-direction: row;
+  gap: 10px;
+}
+
+.settings-row.toggle-row .nav-btn {
+  flex: 1;
+  margin: 0;
+}
+
 .settings-row label {
   color: #ccc;
   font-size: 13px;
