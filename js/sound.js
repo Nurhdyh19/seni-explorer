@@ -22,8 +22,10 @@ function initBackgroundMusic() {
             backgroundAudio.id = 'background-music';
             backgroundAudio.src = 'theme.m4a';
             backgroundAudio.loop = true;
-            backgroundAudio.volume = 0.2; // 20% volume for background music
+            backgroundAudio.volume = musicVolume;
             document.body.appendChild(backgroundAudio);
+        } else {
+            backgroundAudio.volume = musicVolume;
         }
     }
     playBackgroundMusic();
@@ -56,7 +58,7 @@ function playSfx(type) {
     const now = audioContext.currentTime;
     const gain = audioContext.createGain();
     gain.connect(audioContext.destination);
-    gain.gain.value = 0.15;
+    gain.gain.value = 0.15 * sfxVolume;
     const osc = audioContext.createOscillator();
     osc.connect(gain);
     
@@ -69,14 +71,14 @@ function playSfx(type) {
             break;
         case 'hover':
             osc.frequency.value = 523.25;
-            gain.gain.value = 0.08;
+            gain.gain.value = 0.08 * sfxVolume;
             gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.08);
             osc.start(now);
             osc.stop(now + 0.06);
             break;
         case 'roll':
             osc.frequency.value = 659.25;
-            gain.gain.value = 0.2;
+            gain.gain.value = 0.2 * sfxVolume;
             gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.15);
             osc.start(now);
             osc.stop(now + 0.12);
@@ -89,7 +91,7 @@ function playSfx(type) {
             break;
         case 'correct':
             osc.frequency.value = 1046.5;
-            gain.gain.value = 0.2;
+            gain.gain.value = 0.2 * sfxVolume;
             gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.4);
             osc.start(now);
             osc.stop(now + 0.35);
@@ -98,14 +100,14 @@ function playSfx(type) {
             osc2.connect(gain2);
             gain2.connect(audioContext.destination);
             osc2.frequency.value = 1318.52;
-            gain2.gain.value = 0.1;
+            gain2.gain.value = 0.1 * sfxVolume;
             gain2.gain.exponentialRampToValueAtTime(0.0001, now + 0.4);
             osc2.start(now + 0.05);
             osc2.stop(now + 0.4);
             break;
         case 'wrong':
             osc.frequency.value = 261.63;
-            gain.gain.value = 0.15;
+            gain.gain.value = 0.15 * sfxVolume;
             gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.3);
             osc.start(now);
             osc.stop(now + 0.25);

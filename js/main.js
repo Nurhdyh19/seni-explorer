@@ -13,6 +13,80 @@ function hideSplashScreen() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Load volume settings from localStorage
+    loadVolumeSettings();
+    
+    // Initialize volume sliders with saved values (settings panel only)
+    const musicVolumeSliderModal = document.getElementById('music-volume-slider-modal');
+    const sfxVolumeSliderModal = document.getElementById('sfx-volume-slider-modal');
+    
+    // Helper function to update volume displays and sliders
+    function updateAllVolumeSliders() {
+        const musicValue = Math.round(musicVolume * 100);
+        const sfxValue = Math.round(sfxVolume * 100);
+        
+        // Update settings panel sliders
+        if (musicVolumeSliderModal) {
+            musicVolumeSliderModal.value = musicValue;
+            musicVolumeSliderModal.style.setProperty('--value', musicValue + '%');
+        }
+        if (sfxVolumeSliderModal) {
+            sfxVolumeSliderModal.value = sfxValue;
+            sfxVolumeSliderModal.style.setProperty('--value', sfxValue + '%');
+        }
+        
+        // Update displays
+        document.getElementById('music-vol-display-modal').textContent = musicValue;
+        document.getElementById('sfx-vol-display-modal').textContent = sfxValue;
+    }
+    
+    // Initialize sliders
+    updateAllVolumeSliders();
+    
+    // Settings panel sliders
+    if (musicVolumeSliderModal) {
+        musicVolumeSliderModal.addEventListener('input', (e) => {
+            const vol = parseInt(e.target.value) / 100;
+            saveMusicVolume(vol);
+            updateAllVolumeSliders();
+        });
+    }
+    
+    if (sfxVolumeSliderModal) {
+        sfxVolumeSliderModal.addEventListener('input', (e) => {
+            const vol = parseInt(e.target.value) / 100;
+            saveSfxVolume(vol);
+            updateAllVolumeSliders();
+        });
+    }
+    
+    // Settings panel functions
+    function openSettings() {
+        const panel = document.getElementById('settings-panel');
+        if (panel) {
+            panel.classList.add('show');
+            playSfx('click');
+        }
+    }
+    
+    function closeSettings() {
+        const panel = document.getElementById('settings-panel');
+        if (panel) {
+            panel.classList.remove('show');
+            playSfx('modalClose');
+        }
+    }
+    
+    document.getElementById('nav-settings')?.addEventListener('click', openSettings);
+    document.getElementById('settings-close')?.addEventListener('click', closeSettings);
+    
+    // Close settings panel when clicking outside
+    document.getElementById('settings-panel')?.addEventListener('click', (e) => {
+        if (e.target.id === 'settings-panel') {
+            closeSettings();
+        }
+    });
+    
     document.getElementById('num-players')?.addEventListener('change', buildNameInputs);
     document.getElementById('start-btn')?.addEventListener('click', () => { playSfx('click'); startGame(); });
     document.getElementById('roll-btn')?.addEventListener('click', async () => { 
