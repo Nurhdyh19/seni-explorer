@@ -148,8 +148,19 @@ function showResult(isCorrect, pointsEarned, correctAnswerLetter, correctAnswerT
     }
     
     overlay.classList.add('show');
-    setTimeout(() => {
+    let resultTimeoutId = setTimeout(() => {
         overlay.classList.remove('show');
         if (onClose) onClose();
     }, 3000);
+    
+    // Allow skipping by clicking anywhere on the page (after a short delay to prevent immediate close)
+    setTimeout(() => {
+        const skipHandler = (e) => {
+            clearTimeout(resultTimeoutId);
+            overlay.classList.remove('show');
+            document.removeEventListener('click', skipHandler);
+            if (onClose) onClose();
+        };
+        document.addEventListener('click', skipHandler);
+    }, 100);
 }

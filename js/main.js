@@ -15,7 +15,15 @@ function hideSplashScreen() {
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('num-players')?.addEventListener('change', buildNameInputs);
     document.getElementById('start-btn')?.addEventListener('click', () => { playSfx('click'); startGame(); });
-    document.getElementById('roll-btn')?.addEventListener('click', () => { playSfx('click'); rollDice(); });
+    document.getElementById('roll-btn')?.addEventListener('click', async () => { 
+        const resultOverlay = document.getElementById('result-overlay');
+        if (resultOverlay && resultOverlay.classList.contains('show')) {
+            resultOverlay.classList.remove('show');
+            endTurn();
+        }
+        playSfx('click'); 
+        await rollDice(); 
+    });
     
     document.getElementById('nav-home')?.addEventListener('click', returnToHome);
     document.getElementById('nav-restart')?.addEventListener('click', restartGame);
