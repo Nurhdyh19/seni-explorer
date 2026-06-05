@@ -130,7 +130,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     attachHoverSounds();
     enableAudioOnFirstClick();
-    initBackgroundMusic();
     
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();

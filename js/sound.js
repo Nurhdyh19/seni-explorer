@@ -54,7 +54,8 @@ function toggleBackgroundMusic() {
 }
 
 function playSfx(type) {
-    if (!sfxEnabled || !audioContext) return;
+    if (!sfxEnabled) return;
+    if (!audioContext) initAudio();
     const now = audioContext.currentTime;
     const gain = audioContext.createGain();
     gain.connect(audioContext.destination);

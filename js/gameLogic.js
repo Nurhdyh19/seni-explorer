@@ -213,6 +213,7 @@ function endTurn() {
 }
 
 function startGame() {
+    initBackgroundMusic();
     cancelMovement();
     resetMovementFlag();
     
