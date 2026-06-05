@@ -316,6 +316,15 @@ function toggleSound() {
     playSfx('click');
 }
 
+function toggleBgm() {
+    toggleBackgroundMusic();
+    const musicBtn = document.getElementById('nav-music');
+    if (musicBtn) {
+        musicBtn.innerHTML = bgmEnabled ? '🎵 Music ON' : '🔇 Music OFF';
+    }
+    playSfx('click');
+}
+
 function showGuide() {
     playSfx('modalOpen');
     let rawGuide = t('guide_content', { laps: targetLaps });

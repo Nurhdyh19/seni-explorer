@@ -2,6 +2,8 @@
 // sound.js – Audio context and sound effects
 // ============================================================
 
+let backgroundAudio = null;
+
 function initAudio() {
     if (audioContext) return;
     audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -10,6 +12,43 @@ function initAudio() {
     source.buffer = buffer;
     source.connect(audioContext.destination);
     source.start(0);
+}
+
+function initBackgroundMusic() {
+    if (!backgroundAudio) {
+        backgroundAudio = document.getElementById('background-music');
+        if (!backgroundAudio) {
+            backgroundAudio = document.createElement('audio');
+            backgroundAudio.id = 'background-music';
+            backgroundAudio.src = 'theme.m4a';
+            backgroundAudio.loop = true;
+            backgroundAudio.volume = 0.2; // 20% volume for background music
+            document.body.appendChild(backgroundAudio);
+        }
+    }
+    playBackgroundMusic();
+}
+
+function playBackgroundMusic() {
+    if (backgroundAudio && bgmEnabled) {
+        backgroundAudio.play().catch(() => {});
+    }
+}
+
+function stopBackgroundMusic() {
+    if (backgroundAudio) {
+        backgroundAudio.pause();
+        backgroundAudio.currentTime = 0;
+    }
+}
+
+function toggleBackgroundMusic() {
+    bgmEnabled = !bgmEnabled;
+    if (bgmEnabled) {
+        playBackgroundMusic();
+    } else {
+        stopBackgroundMusic();
+    }
 }
 
 function playSfx(type) {
@@ -105,6 +144,7 @@ function hoverHandler() {
 function enableAudioOnFirstClick() {
     const handler = () => {
         initAudio();
+        playBackgroundMusic();
         playSfx('click');
         document.removeEventListener('click', handler);
         document.removeEventListener('touchstart', handler);

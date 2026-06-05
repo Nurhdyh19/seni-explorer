@@ -20,10 +20,12 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('nav-home')?.addEventListener('click', returnToHome);
     document.getElementById('nav-restart')?.addEventListener('click', restartGame);
     document.getElementById('nav-sound')?.addEventListener('click', toggleSound);
+    document.getElementById('nav-music')?.addEventListener('click', toggleBgm);
     document.getElementById('nav-guide')?.addEventListener('click', showGuide);
     
     attachHoverSounds();
     enableAudioOnFirstClick();
+    initBackgroundMusic();
     
     // Load localization first, then game data (or in parallel)
     loadLocalization().then(() => {

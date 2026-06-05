@@ -16,6 +16,7 @@ let movementCancelled = false;
 // Sound & localization globals
 let audioContext = null;
 let sfxEnabled = true;
+let bgmEnabled = true;
 let uiText = {};
 let localizationLoaded = false;
 
