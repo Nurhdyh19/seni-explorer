@@ -99,6 +99,8 @@ function applyLocalizationToUI() {
     if (settingsBtn) settingsBtn.textContent = t('nav_settings');
     const guideBtn = document.getElementById('nav-guide');
     if (guideBtn) guideBtn.textContent = t('nav_guide');
+    const installBtn = document.getElementById('nav-install');
+    if (installBtn) installBtn.textContent = t('nav_install');
     
     // Setup panel
     const setupTitle = document.querySelector('#setup h2');

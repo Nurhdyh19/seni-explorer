@@ -2,6 +2,8 @@
 // main.js – Initialisation and event binding
 // ============================================================
 
+let deferredInstallPrompt = null;
+
 function hideSplashScreen() {
     const splash = document.getElementById('splash-screen');
     if (splash) {
@@ -9,6 +11,19 @@ function hideSplashScreen() {
         setTimeout(() => {
             splash.style.display = 'none';
         }, 800);
+    }
+}
+
+function showInstallButton(show = true) {
+    const installBtn = document.getElementById('nav-install');
+    if (!installBtn) return;
+    installBtn.style.display = show ? 'inline-flex' : 'none';
+}
+
+function setInstallButtonLabel() {
+    const installBtn = document.getElementById('nav-install');
+    if (installBtn) {
+        installBtn.textContent = t('nav_install');
     }
 }
 
@@ -103,11 +118,32 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('nav-restart')?.addEventListener('click', restartGame);
     document.getElementById('nav-sound')?.addEventListener('click', toggleSound);
     document.getElementById('nav-music')?.addEventListener('click', toggleBgm);
+    document.getElementById('nav-install')?.addEventListener('click', async () => {
+        if (!deferredInstallPrompt) return;
+        deferredInstallPrompt.prompt();
+        const choiceResult = await deferredInstallPrompt.userChoice;
+        deferredInstallPrompt = null;
+        showInstallButton(false);
+        console.log('Install prompt choice:', choiceResult.outcome);
+    });
     document.getElementById('nav-guide')?.addEventListener('click', showGuide);
     
     attachHoverSounds();
     enableAudioOnFirstClick();
     initBackgroundMusic();
+    
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredInstallPrompt = e;
+        setInstallButtonLabel();
+        showInstallButton(true);
+    });
+    
+    window.addEventListener('appinstalled', () => {
+        deferredInstallPrompt = null;
+        showInstallButton(false);
+        console.log('App successfully installed');
+    });
     
     // Load localization first, then game data (or in parallel)
     loadLocalization().then(() => {
