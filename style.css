@@ -89,22 +89,13 @@ h1 {
   border-radius: 0;
   border: none;
 }
-#game-area > *:not(#board-wrap),
-body > h1,
-body > #game-nav {
-  transition: opacity 0.3s ease, visibility 0.3s ease;
-}
-
 #game-area.board-is-expanding > *:not(#board-wrap),
-#game-area.board-is-fullscreen > *:not(#board-wrap) {
-  visibility: hidden;
-  opacity: 0;
-}
-
+#game-area.board-is-fullscreen > *:not(#board-wrap),
 body.board-is-expanding h1,
 body.board-is-expanding #game-nav,
 body.board-is-fullscreen h1,
 body.board-is-fullscreen #game-nav {
+  transition: opacity 0.3s ease, visibility 0.3s ease;
   visibility: hidden;
   opacity: 0;
 }
