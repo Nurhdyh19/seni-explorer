@@ -243,6 +243,7 @@ function startGame() {
     buildCells();
     renderTokens();
     renderPlayers();
+    initBoardClickToggle();
     addLog(t('game_start_log', { laps: targetLaps }));
     rolled = false;
     isMoving = false;

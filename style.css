@@ -71,40 +71,42 @@ h1 {
   width: auto;
   flex-shrink: 1;
   min-height: 0;
-  transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-              height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 1;
 }
 
-#board-wrap.board-fullscreen {
+#board-wrap.board-animating {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: min(100vw, 100vh);
-  height: min(100vw, 100vh);
   z-index: 999;
-  border-radius: 0;
-  aspect-ratio: 1/1;
+  aspect-ratio: unset;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+              height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-
-
-#board-backdrop {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: #1a1a2e;
-  z-index: 998;
-  pointer-events: none;
-}
-
-#board-wrap.board-fullscreen #board-img {
+#board-wrap.board-animating #board-img {
   border-radius: 0;
   border: none;
+}
+#game-area > *:not(#board-wrap),
+body > h1,
+body > #game-nav {
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+#game-area.board-is-expanding > *:not(#board-wrap),
+#game-area.board-is-fullscreen > *:not(#board-wrap) {
+  visibility: hidden;
+  opacity: 0;
+}
+
+body.board-is-expanding h1,
+body.board-is-expanding #game-nav,
+body.board-is-fullscreen h1,
+body.board-is-fullscreen #game-nav {
+  visibility: hidden;
+  opacity: 0;
 }
 
 #board-img {
@@ -382,6 +384,8 @@ button:active {
   gap: 12px;
   width: 100%;
   overflow: hidden;
+  position: relative;
+  z-index: 1;
 }
 
 #log-wrap {
@@ -392,6 +396,8 @@ button:active {
   max-height: 70px;
   overflow-y: auto;
   border: 1px solid #333;
+  position: relative;
+  z-index: 1;
 }
 
 #log {
