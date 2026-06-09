@@ -29,6 +29,8 @@ async function rollDice() {
                 closeModal();
                 addLog(t('log_jailed_turn_skipped', { name: curr.name }));
                 curr.jailed = false;
+                // Force rolled=true so endTurn() doesn't silently bail out
+                rolled = true;
                 endTurn();
             }
         }]);
@@ -63,9 +65,15 @@ function handleLanding(p, spaceIndex) {
             showModalWithImage(t('modal_jail_landing_title'), t('modal_jail_landing_message', { emoji: p.emoji, name: p.name }), 'jail', [{
                 label: t('modal_jail_ok_btn'), fn: () => {
                     playSfx('click');
+                    // Teleport token to pudu space
+                    const puduIndex = spaceSequence.indexOf('pudu');
+                    if (puduIndex !== -1) p.pos = puduIndex;
                     p.jailed = true;
+                    // Deduct 1 lap (minimum 0)
+                    if (p.laps > 0) p.laps--;
                     closeModal();
                     addLog(t('log_jailed', { name: p.name }));
+                    renderTokens();
                     renderPlayers();
                     endTurn();
                 }
