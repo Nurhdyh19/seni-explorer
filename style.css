@@ -803,6 +803,12 @@ input[type="text"],
   color: #F4A820;
 }
 
+.result-countdown {
+  font-size: 11px;
+  color: #888;
+  margin-top: 14px;
+}
+
 /* ── SPLASH SCREEN ── */
 #splash-screen {
   position: fixed;

@@ -170,15 +170,31 @@ function showResult(isCorrect, pointsEarned, correctAnswerLetter, correctAnswerT
     
     overlay.classList.add('show');
     
-    // Auto-close after 5 seconds
+    const SECONDS = 5;
+    let remaining = SECONDS;
+    const countdownEl = document.getElementById('result-countdown');
+    countdownEl.textContent = t('result_countdown', { seconds: remaining });
+    
+    const countdownInterval = setInterval(() => {
+        remaining--;
+        if (remaining > 0) {
+            countdownEl.textContent = t('result_countdown', { seconds: remaining });
+        } else {
+            clearInterval(countdownInterval);
+        }
+    }, 1000);
+    
+    // Auto-close after SECONDS seconds
     let resultTimeoutId = setTimeout(() => {
+        clearInterval(countdownInterval);
         overlay.classList.remove('show');
         if (onClose) onClose();
-    }, 5000);
+    }, SECONDS * 1000);
     
     // Allow skipping by clicking anywhere on the page
     overlay.onclick = () => {
         clearTimeout(resultTimeoutId);
+        clearInterval(countdownInterval);
         overlay.classList.remove('show');
         overlay.onclick = null;
         if (onClose) onClose();

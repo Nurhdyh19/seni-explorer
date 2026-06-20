@@ -68,6 +68,7 @@ result_wrong_title: "SALAH!"
 result_points_format: "+{points} mata"
 result_no_points: "Tiada mata diperoleh."
 result_wrong_answer_format: "Jawapan betul: {letter}. {text}"
+result_countdown: "Tutup dalam {seconds}s"
 
 # ---------- LOG MESSAGES ----------
 log_lap_complete: "{emoji} {name} melengkapkan 1 pusingan! ({laps}/{target})"
