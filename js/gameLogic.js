@@ -184,7 +184,7 @@ function handleLanding(p, spaceIndex) {
         const optionsContainer = document.getElementById('quiz-options');
         optionsContainer.innerHTML = '';
         
-    addImageToModal('drawing', 'modal-body');
+    addImageToModal(spaceKey, 'modal-body');
         
         choices.forEach((opt, idx) => {
             const btn = document.createElement('div');
