@@ -86,6 +86,12 @@ function clearHighlight() {
     document.querySelectorAll('.cell-hit.highlight').forEach(c => c.classList.remove('highlight'));
 }
 
+function addEvent(msg) {
+    const input = document.getElementById('game-feed');
+    if (!input) return;
+    input.value = '› ' + msg;
+}
+
 function buildNameInputs() {
     const numSelect = document.getElementById('num-players');
     if (!numSelect) return;

@@ -2,6 +2,8 @@
 // gameLogic.js – Core gameplay: rolling, landing, turn handling
 // ============================================================
 
+function updateUtilityPanel() {}
+
 function checkWinner() {
     const winner = players.find(p => p.laps >= targetLaps);
     if (winner) {
@@ -292,7 +294,9 @@ function endTurn() {
     updateTurnLabel();
     renderPlayers();
     updateActiveToken();
+    updateUtilityPanel();
     addLog(t('log_turn_change', { emoji: players[currentPlayer].emoji, name: players[currentPlayer].name }));
+    addEvent(t('log_turn_change', { emoji: players[currentPlayer].emoji, name: players[currentPlayer].name }));
 }
 
 function startGame() {
@@ -322,12 +326,14 @@ function startGame() {
         });
     }
     document.getElementById('setup').style.display = 'none';
-    document.getElementById('game-area').style.display = 'flex';
+    document.getElementById('game-area').style.display = 'grid';
     buildCells();
     renderTokens();
     renderPlayers();
     initBoardClickToggle();
     addLog(t('game_start_log', { laps: targetLaps }));
+    addEvent(t('game_start_log', { laps: targetLaps }));
+    updateUtilityPanel();
     rolled = false;
     isMoving = false;
     updateDieFace(1);

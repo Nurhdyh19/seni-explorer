@@ -52,13 +52,16 @@ function renderTokens() {
 
 function renderPlayers() {
     const container = document.getElementById('players-row');
-    container.innerHTML = players.map((p, i) =>
-        `<div class="player-card${i === currentPlayer ? ' active' : ''}">
+    const sorted = [...players].sort((a, b) => b.score - a.score);
+    container.innerHTML = sorted.map((p, i) =>
+        `<div class="player-card${players.indexOf(p) === currentPlayer ? ' active' : ''}">
             <div class="token-badge" style="background:${p.color}">${p.emoji}</div>
-            <div>
+            <div class="player-info">
                 <div class="player-name">${p.name} ${p.jailed ? '🚫' : ''}</div>
-                <div class="player-score">${t('player_score_label', { score: p.score })}</div>
                 <div class="player-laps">${t('player_laps_label', { laps: p.laps, target: targetLaps })}</div>
+            </div>
+            <div class="player-stats">
+                <div class="player-score">⭐ ${p.score}</div>
             </div>
         </div>`
     ).join('');
@@ -85,6 +88,7 @@ function addLog(msg) {
     const logDiv = document.getElementById('log');
     logDiv.innerHTML += `<div>› ${msg}</div>`;
     logDiv.parentElement.scrollTop = logDiv.parentElement.scrollHeight;
+    addEvent(msg);
 }
 
 function showModalWithImage(title, body, imageKey, btns) {
