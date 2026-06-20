@@ -86,7 +86,10 @@ function updateTurnLabel() {
 
 function addLog(msg) {
     const logDiv = document.getElementById('log');
-    logDiv.innerHTML += `<div>› ${msg}</div>`;
+    const input = document.getElementById('game-feed');
+    if (input && input.value && input.value !== 'Seni Eksplorer') {
+        logDiv.innerHTML += `<div>${input.value}</div>`;
+    }
     logDiv.parentElement.scrollTop = logDiv.parentElement.scrollHeight;
     addEvent(msg);
 }
