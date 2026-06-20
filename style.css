@@ -132,22 +132,6 @@ body {
   text-align: center;
 }
 
-/* Ad placeholder */
-#left-middle {
-  flex: 0 0 90px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #0f0f23;
-  border: 1px dashed #333;
-}
-
-#left-middle span {
-  font-size: 12px;
-  color: #555;
-  font-style: italic;
-}
-
 /* Player list block */
 #left-bottom {
   flex: 1;
@@ -1155,10 +1139,6 @@ input[type="text"],
     padding: 4px;
   }
 
-  #left-middle {
-    height: 60px;
-  }
-
   #center-canvas {
     height: 28px;
   }
@@ -1191,7 +1171,4 @@ input[type="text"],
     padding: 4px;
   }
 
-  #left-middle {
-    height: 60px;
-  }
 }
