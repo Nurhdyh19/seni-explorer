@@ -8,7 +8,7 @@ function parseChoices(choicesStr) {
 }
 
 function getSpaceImageUrl(spaceKey) {
-    return `images/${spaceKey}.png`;
+    return `images/${spaceKey}.webp`;
 }
 
 function addImageToModal(spaceKey, containerId = 'modal-body') {
