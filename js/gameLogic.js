@@ -184,7 +184,7 @@ function handleLanding(p, spaceIndex) {
         const optionsContainer = document.getElementById('quiz-options');
         optionsContainer.innerHTML = '';
         
-        addImageToModal(spaceKey, 'modal-body');
+    addImageToModal('drawing', 'modal-body');
         
         choices.forEach((opt, idx) => {
             const btn = document.createElement('div');
@@ -243,7 +243,7 @@ function showDrawingChallenge(p, spaceKey, sp, pts) {
     const btnsDiv = document.getElementById('modal-btns');
     btnsDiv.innerHTML = '';
 
-    addImageToModal(spaceKey, 'modal-body');
+    addImageToModal('drawing', 'modal-body');
     document.getElementById('modal').classList.add('show');
     attachHoverSounds();
 
@@ -259,7 +259,7 @@ function showDrawingChallenge(p, spaceKey, sp, pts) {
                 renderPlayers();
                 closeModal();
                 const imageUrl = getSpaceImageUrl(spaceKey);
-                showResult(true, pts, "", "", () => endTurn(), imageUrl);
+                showResult(true, pts, "", "", () => endTurn(), imageUrl, sp.label);
             };
         }
         if (salahBtn) {
@@ -267,7 +267,7 @@ function showDrawingChallenge(p, spaceKey, sp, pts) {
                 playSfx('click');
                 addLog(t('drawing_log_wrong', { emoji: p.emoji, name: p.name }));
                 closeModal();
-                showResult(false, 0, "", "", () => endTurn(), null);
+                showResult(false, 0, "", "", () => endTurn(), null, sp.label);
             };
         }
         if (skipBtn) {
