@@ -1182,3 +1182,16 @@ input[type="text"],
     font-size: 10px;
   }
 }
+
+@media (max-width: 500px) {
+  #game-area {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto;
+    gap: 4px;
+    padding: 4px;
+  }
+
+  #left-middle {
+    height: 60px;
+  }
+}
