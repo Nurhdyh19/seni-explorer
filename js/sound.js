@@ -84,6 +84,22 @@ function playSfx(type) {
             osc.start(now);
             osc.stop(now + 0.12);
             break;
+        case 'diceTick':
+            osc.frequency.value = 1200 + Math.random() * 800;
+            gain.gain.value = 0.06 * sfxVolume;
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.04);
+            osc.type = 'square';
+            osc.start(now);
+            osc.stop(now + 0.03);
+            break;
+        case 'diceLand':
+            osc.frequency.value = 400;
+            gain.gain.value = 0.12 * sfxVolume;
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.08);
+            osc.type = 'triangle';
+            osc.start(now);
+            osc.stop(now + 0.06);
+            break;
         case 'move':
             osc.frequency.value = 440;
             gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.1);
