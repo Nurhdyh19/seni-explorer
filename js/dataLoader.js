@@ -8,7 +8,7 @@ function preloadAllSpaceImages() {
     preloadKeys.forEach(key => {
         if (key && typeof key === 'string') {
             const img = new Image();
-            img.src = `images/${key}.png`;
+            img.src = `images/${key}.webp`;
         }
     });
 }

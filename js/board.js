@@ -52,13 +52,16 @@ function renderTokens() {
 
 function renderPlayers() {
     const container = document.getElementById('players-row');
-    container.innerHTML = players.map((p, i) =>
-        `<div class="player-card${i === currentPlayer ? ' active' : ''}">
+    const sorted = [...players].sort((a, b) => b.score - a.score);
+    container.innerHTML = sorted.map((p, i) =>
+        `<div class="player-card${players.indexOf(p) === currentPlayer ? ' active' : ''}">
             <div class="token-badge" style="background:${p.color}">${p.emoji}</div>
-            <div>
+            <div class="player-info">
                 <div class="player-name">${p.name} ${p.jailed ? '🚫' : ''}</div>
-                <div class="player-score">${t('player_score_label', { score: p.score })}</div>
                 <div class="player-laps">${t('player_laps_label', { laps: p.laps, target: targetLaps })}</div>
+            </div>
+            <div class="player-stats">
+                <div class="player-score">⭐ ${p.score}</div>
             </div>
         </div>`
     ).join('');
@@ -83,8 +86,12 @@ function updateTurnLabel() {
 
 function addLog(msg) {
     const logDiv = document.getElementById('log');
-    logDiv.innerHTML += `<div>› ${msg}</div>`;
+    const input = document.getElementById('game-feed');
+    if (input && input.value && input.value !== 'Seni Eksplorer') {
+        logDiv.innerHTML += `<div>${input.value}</div>`;
+    }
     logDiv.parentElement.scrollTop = logDiv.parentElement.scrollHeight;
+    addEvent(msg);
 }
 
 function showModalWithImage(title, body, imageKey, btns) {
@@ -163,15 +170,31 @@ function showResult(isCorrect, pointsEarned, correctAnswerLetter, correctAnswerT
     
     overlay.classList.add('show');
     
-    // Auto-close after 5 seconds
+    const SECONDS = 5;
+    let remaining = SECONDS;
+    const countdownEl = document.getElementById('result-countdown');
+    countdownEl.textContent = t('result_countdown', { seconds: remaining });
+    
+    const countdownInterval = setInterval(() => {
+        remaining--;
+        if (remaining > 0) {
+            countdownEl.textContent = t('result_countdown', { seconds: remaining });
+        } else {
+            clearInterval(countdownInterval);
+        }
+    }, 1000);
+    
+    // Auto-close after SECONDS seconds
     let resultTimeoutId = setTimeout(() => {
+        clearInterval(countdownInterval);
         overlay.classList.remove('show');
         if (onClose) onClose();
-    }, 5000);
+    }, SECONDS * 1000);
     
     // Allow skipping by clicking anywhere on the page
     overlay.onclick = () => {
         clearTimeout(resultTimeoutId);
+        clearInterval(countdownInterval);
         overlay.classList.remove('show');
         overlay.onclick = null;
         if (onClose) onClose();

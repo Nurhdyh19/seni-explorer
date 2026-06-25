@@ -2,20 +2,97 @@
 // gameLogic.js – Core gameplay: rolling, landing, turn handling
 // ============================================================
 
+function updateUtilityPanel() {}
+
 function checkWinner() {
     const winner = players.find(p => p.laps >= targetLaps);
     if (winner) {
         gameActive = false;
         playSfx('correct');
-        showModalWithImage(
-            t('modal_winner_title'),
-            t('modal_winner_message', { emoji: winner.emoji, name: winner.name, laps: winner.laps }),
-            null,
-            [{ label: t('modal_play_again'), fn: () => location.reload() }]
-        );
+        showWinnerOverlay(winner);
         return true;
     }
     return false;
+}
+
+function showWinnerOverlay(winner) {
+    // Build ranked scoreboard (sort by laps desc, then score desc)
+    const ranked = [...players].sort((a, b) =>
+        b.laps !== a.laps ? b.laps - a.laps : b.score - a.score
+    );
+    const medals = ['🥇', '🥈', '🥉', '4️⃣'];
+
+    const overlay = document.getElementById('winner-overlay');
+    const nameEl = document.getElementById('winner-name');
+    const scoreboard = document.getElementById('winner-scoreboard');
+
+    nameEl.textContent = winner.emoji + ' ' + winner.name;
+    nameEl.style.color = winner.color;
+
+    scoreboard.innerHTML = ranked.map((p, i) => `
+        <div class="winner-row rank-${i + 1}">
+            <span class="winner-medal">${medals[i] || (i + 1 + '.')}</span>
+            <div class="winner-token" style="background:${p.color}">${p.emoji}</div>
+            <div class="winner-player-info">
+                <div class="winner-player-name">${p.name}</div>
+                <div class="winner-player-sub">🏁 ${p.laps} pusingan</div>
+            </div>
+            <div class="winner-player-score">⭐ ${p.score}</div>
+        </div>
+    `).join('');
+
+    document.getElementById('winner-play-again').onclick = () => location.reload();
+
+    overlay.classList.add('show');
+    startConfetti(winner.color);
+}
+
+function startConfetti(winnerColor) {
+    const canvas = document.getElementById('confetti-canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const COLORS = ['#F4A820', winnerColor, '#fff', '#2ECC71', '#3498DB', '#E74C3C', '#9B59B6'];
+    const pieces = Array.from({ length: 120 }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height - canvas.height,
+        w: 6 + Math.random() * 8,
+        h: 10 + Math.random() * 6,
+        color: COLORS[Math.floor(Math.random() * COLORS.length)],
+        rotation: Math.random() * Math.PI * 2,
+        rotationSpeed: (Math.random() - 0.5) * 0.12,
+        vx: (Math.random() - 0.5) * 2.5,
+        vy: 2.5 + Math.random() * 3,
+        opacity: 0.85 + Math.random() * 0.15
+    }));
+
+    let frame = 0;
+    const MAX_FRAMES = 300;
+
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        pieces.forEach(p => {
+            ctx.save();
+            ctx.globalAlpha = p.opacity * Math.max(0, 1 - frame / MAX_FRAMES);
+            ctx.translate(p.x, p.y);
+            ctx.rotate(p.rotation);
+            ctx.fillStyle = p.color;
+            ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+            ctx.restore();
+            p.x += p.vx;
+            p.y += p.vy;
+            p.rotation += p.rotationSpeed;
+            if (p.y > canvas.height) {
+                p.y = -20;
+                p.x = Math.random() * canvas.width;
+            }
+        });
+        frame++;
+        if (frame < MAX_FRAMES) requestAnimationFrame(draw);
+        else ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+    draw();
 }
 
 async function rollDice() {
@@ -29,6 +106,8 @@ async function rollDice() {
                 closeModal();
                 addLog(t('log_jailed_turn_skipped', { name: curr.name }));
                 curr.jailed = false;
+                // Force rolled=true so endTurn() doesn't silently bail out
+                rolled = true;
                 endTurn();
             }
         }]);
@@ -63,9 +142,15 @@ function handleLanding(p, spaceIndex) {
             showModalWithImage(t('modal_jail_landing_title'), t('modal_jail_landing_message', { emoji: p.emoji, name: p.name }), 'jail', [{
                 label: t('modal_jail_ok_btn'), fn: () => {
                     playSfx('click');
+                    // Teleport token to pudu space
+                    const puduIndex = spaceSequence.indexOf('pudu');
+                    if (puduIndex !== -1) p.pos = puduIndex;
                     p.jailed = true;
+                    // Deduct 1 lap (minimum 0)
+                    if (p.laps > 0) p.laps--;
                     closeModal();
                     addLog(t('log_jailed', { name: p.name }));
+                    renderTokens();
                     renderPlayers();
                     endTurn();
                 }
@@ -99,7 +184,7 @@ function handleLanding(p, spaceIndex) {
         const optionsContainer = document.getElementById('quiz-options');
         optionsContainer.innerHTML = '';
         
-        addImageToModal(spaceKey, 'modal-body');
+    addImageToModal(spaceKey, 'modal-body');
         
         choices.forEach((opt, idx) => {
             const btn = document.createElement('div');
@@ -158,7 +243,7 @@ function showDrawingChallenge(p, spaceKey, sp, pts) {
     const btnsDiv = document.getElementById('modal-btns');
     btnsDiv.innerHTML = '';
 
-    addImageToModal(spaceKey, 'modal-body');
+    addImageToModal('drawing', 'modal-body');
     document.getElementById('modal').classList.add('show');
     attachHoverSounds();
 
@@ -174,7 +259,7 @@ function showDrawingChallenge(p, spaceKey, sp, pts) {
                 renderPlayers();
                 closeModal();
                 const imageUrl = getSpaceImageUrl(spaceKey);
-                showResult(true, pts, "", "", () => endTurn(), imageUrl);
+                showResult(true, pts, "", "", () => endTurn(), imageUrl, sp.label);
             };
         }
         if (salahBtn) {
@@ -182,7 +267,7 @@ function showDrawingChallenge(p, spaceKey, sp, pts) {
                 playSfx('click');
                 addLog(t('drawing_log_wrong', { emoji: p.emoji, name: p.name }));
                 closeModal();
-                showResult(false, 0, "", "", () => endTurn(), null);
+                showResult(false, 0, "", "", () => endTurn(), null, sp.label);
             };
         }
         if (skipBtn) {
@@ -209,7 +294,9 @@ function endTurn() {
     updateTurnLabel();
     renderPlayers();
     updateActiveToken();
+    updateUtilityPanel();
     addLog(t('log_turn_change', { emoji: players[currentPlayer].emoji, name: players[currentPlayer].name }));
+    addEvent(t('log_turn_change', { emoji: players[currentPlayer].emoji, name: players[currentPlayer].name }));
 }
 
 function startGame() {
@@ -239,12 +326,14 @@ function startGame() {
         });
     }
     document.getElementById('setup').style.display = 'none';
-    document.getElementById('game-area').style.display = 'flex';
+    document.getElementById('game-area').style.display = 'grid';
     buildCells();
     renderTokens();
     renderPlayers();
     initBoardClickToggle();
     addLog(t('game_start_log', { laps: targetLaps }));
+    addEvent(t('game_start_log', { laps: targetLaps }));
+    updateUtilityPanel();
     rolled = false;
     isMoving = false;
     updateDieFace(1);

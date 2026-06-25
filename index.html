@@ -14,17 +14,6 @@
   <img src="splash.jpg" alt="Seni Eksplorer" id="splash-image">
 </div>
 
-<h1>🎨 Seni Eksplorer</h1>
-
-<!-- NAVIGATION BAR -->
-<div id="game-nav" class="game-nav">
-  <button id="nav-home" class="nav-btn">🏠 Home</button>
-  <button id="nav-restart" class="nav-btn">🔄 Restart Game</button>
-  <button id="nav-install" class="nav-btn" style="display:none">⬇️ Pasang</button>
-  <button id="nav-settings" class="nav-btn">⚙️ Settings</button>
-  <button id="nav-guide" class="nav-btn">📖 Guide</button>
-</div>
-
 <div id="loading-message" class="loading">Memuatkan data permainan...</div>
 
 <div id="setup" style="display:none">
@@ -56,27 +45,63 @@
   <button id="start-btn">Mulakan Permainan 🎲</button>
 </div>
 
+<!-- THREE-COLUMN GAME AREA -->
 <div id="game-area" style="display:none">
-  <div id="board-wrap">
-    <img id="board-img" src="Copy_of_inovasi_2026.png" alt="Seni Eksplorer Board" onerror="this.src='https://placehold.co/800x800/2c3e50/F4A820?text=Board+Seni'"/>
-    <div id="cells-layer"></div>
-    <div id="tokens-layer"></div>
-  </div>
-  <div id="players-row"></div>
-  <div id="controls">
-    <div id="dice-display">
-      <div class="die" id="die">
-        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  <!-- LEFT SIDEBAR -->
+  <div id="left-sidebar" class="sidebar">
+    <div id="left-top" class="sidebar-block">
+      <div id="utility-panel">
+        <h1>🎨 Seni Eksplorer</h1>
+        <div id="utility-btns">
+          <button id="nav-home" class="nav-btn">🏠 Home</button>
+          <button id="nav-restart" class="nav-btn">🔄 Restart Game</button>
+          <button id="nav-install" class="nav-btn" style="display:none">⬇️ Pasang</button>
+          <button id="nav-settings" class="nav-btn">⚙️ Settings</button>
+          <button id="nav-guide" class="nav-btn">📖 Guide</button>
+        </div>
       </div>
     </div>
-    <button id="roll-btn">Buang Dadu</button>
-    <span id="turn-label"></span>
+    <div id="left-bottom" class="sidebar-block playerlist-block">
+      <div id="players-row"></div>
+    </div>
   </div>
-  <div id="log-wrap"><div id="log"></div></div>
+
+  <!-- CENTER COLUMN -->
+  <div id="center-column" class="center-col">
+    <div id="board-center-area">
+      <div id="board-wrap">
+        <img id="board-img" src="board.webp" alt="Seni Eksplorer Board" onerror="this.src='https://placehold.co/800x800/2c3e50/F4A820?text=Board+Seni'"/>
+        <div id="cells-layer"></div>
+        <div id="tokens-layer"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT SIDEBAR -->
+  <div id="right-sidebar" class="sidebar">
+    <div id="right-top" class="sidebar-block messaging-block">
+      <div id="log-container">
+        <div id="log"></div>
+      </div>
+      <input id="game-feed" type="text" readonly value="Seni Eksplorer">
+    </div>
+    <div id="right-bottom" class="sidebar-block action-block">
+      <div id="controls">
+        <div id="dice-display">
+          <div class="die" id="die">
+            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+          </div>
+        </div>
+        <button id="roll-btn">Buang Dadu</button>
+        <span id="turn-label"></span>
+      </div>
+    </div>
+  </div>
 </div>
 
+<!-- MODAL -->
 <div id="modal">
   <div id="modal-box">
     <div id="modal-title"></div>
@@ -85,15 +110,33 @@
   </div>
 </div>
 
+<!-- RESULT OVERLAY -->
 <div id="result-overlay" class="result-overlay">
-  <span id="result-emoji" class="result-emoji">🎉</span>
-  <div id="result-text" class="result-text"></div>
-  <div id="result-question" class="result-question"></div>
-  <div id="result-choices" class="result-choices"></div>
-  <div id="result-points" class="result-points"></div>
-  <img id="result-image" class="answer-img" style="display:none; margin-top:10px;" />
+  <div id="result-box">
+    <span id="result-emoji" class="result-emoji">🎉</span>
+    <div id="result-text" class="result-text"></div>
+    <div id="result-question" class="result-question"></div>
+    <div id="result-choices" class="result-choices"></div>
+    <div id="result-points" class="result-points"></div>
+    <img id="result-image" class="answer-img" style="display:none; margin-top:10px;" />
+    <div id="result-countdown" class="result-countdown"></div>
+  </div>
 </div>
 
+<!-- WINNER OVERLAY -->
+<div id="winner-overlay" class="winner-overlay">
+  <canvas id="confetti-canvas" class="confetti-canvas"></canvas>
+  <div id="winner-box" class="winner-box">
+    <div class="winner-crown">👑</div>
+    <div class="winner-title">PEMENANG!</div>
+    <div id="winner-name" class="winner-name"></div>
+    <div class="winner-divider"></div>
+    <div id="winner-scoreboard" class="winner-scoreboard"></div>
+    <button id="winner-play-again" class="winner-play-again">🔄 Main Semula</button>
+  </div>
+</div>
+
+<!-- SETTINGS PANEL -->
 <div id="settings-panel" class="settings-panel">
   <div class="settings-content">
     <div class="settings-header">

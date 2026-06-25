@@ -2,73 +2,11 @@
 // animations.js – Player movement and step animation
 // ============================================================
 
-const FADE_MS = 300;
-const BOARD_TRANSITION_MS = 400;
+async function expandBoard() {}
 
-let _boardNaturalSize = null;
-let _isBoardFullscreen = false;
-let _boardAnimating = false;
+async function collapseBoard(delay = 800) {}
 
-function setUIVisible(visible) {
-    const gameArea = document.getElementById('game-area');
-    gameArea.classList.toggle('board-is-expanding', !visible);
-    gameArea.classList.toggle('board-is-fullscreen', !visible);
-    document.body.classList.toggle('board-is-expanding', !visible);
-    document.body.classList.toggle('board-is-fullscreen', !visible);
-}
-
-async function expandBoard() {
-    const board = document.getElementById('board-wrap');
-    const rect = board.getBoundingClientRect();
-    _boardNaturalSize = rect.width;
-    setUIVisible(false);
-    await new Promise(r => setTimeout(r, FADE_MS));
-    board.style.width = _boardNaturalSize + 'px';
-    board.style.height = _boardNaturalSize + 'px';
-    board.classList.add('board-animating');
-    board.getBoundingClientRect();
-    const full = Math.min(window.innerWidth, window.innerHeight);
-    board.style.width = full + 'px';
-    board.style.height = full + 'px';
-    _isBoardFullscreen = true;
-    await new Promise(r => setTimeout(r, BOARD_TRANSITION_MS));
-}
-
-async function collapseBoard(delay = 800) {
-    return new Promise(r => setTimeout(async () => {
-        const board = document.getElementById('board-wrap');
-        board.style.width = _boardNaturalSize + 'px';
-        board.style.height = _boardNaturalSize + 'px';
-        await new Promise(r2 => setTimeout(r2, BOARD_TRANSITION_MS));
-        board.classList.remove('board-animating');
-        board.style.width = '';
-        board.style.height = '';
-        _isBoardFullscreen = false;
-        setUIVisible(true);
-        await new Promise(r2 => setTimeout(r2, FADE_MS));
-        r();
-    }, delay));
-}
-
-async function toggleBoardSize() {
-    if (_boardAnimating) return;
-    _boardAnimating = true;
-    if (_isBoardFullscreen) {
-        await collapseBoard(0);
-    } else {
-        await expandBoard();
-    }
-    _boardAnimating = false;
-}
-
-function initBoardClickToggle() {
-    const board = document.getElementById('board-wrap');
-    board.addEventListener('click', (e) => {
-        // Don't trigger if clicking a cell (cell has its own handler)
-        if (e.target.classList.contains('cell-hit') || e.target.closest('.cell-hit')) return;
-        toggleBoardSize();
-    });
-}
+function initBoardClickToggle() {}
 
 async function animateStepwise(player, steps) {
     await expandBoard();

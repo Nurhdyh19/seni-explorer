@@ -8,7 +8,7 @@ function parseChoices(choicesStr) {
 }
 
 function getSpaceImageUrl(spaceKey) {
-    return `images/${spaceKey}.png`;
+    return `images/${spaceKey}.webp`;
 }
 
 function addImageToModal(spaceKey, containerId = 'modal-body') {
@@ -37,24 +37,34 @@ async function animateRoll(finalValue) {
     const rollBtn = document.getElementById('roll-btn');
     rollBtn.disabled = true;
     const diceContainer = document.getElementById('dice-display');
+    diceContainer.classList.remove('bounce');
     diceContainer.classList.add('rolling');
     playSfx('roll');
-    const steps = 16;
-    const interval = 25;
+    const steps = 20;
+    let interval = 40;
     for (let i = 0; i <= steps; i++) {
         if (movementCancelled || !gameActive) {
             rollBtn.disabled = false;
             diceContainer.classList.remove('rolling');
             return;
         }
-        if (i === steps) updateDieFace(finalValue);
-        else updateDieFace(Math.floor(Math.random() * 6) + 1);
+        if (i === steps) {
+            updateDieFace(finalValue);
+        } else {
+            updateDieFace(Math.floor(Math.random() * 6) + 1);
+            if (i % 2 === 0) playSfx('diceTick');
+        }
+        if (i < 12) interval = 40 + (i < 4 ? i * 10 : 0);
+        else interval = Math.max(30, 40 - (i - 12) * 8);
         await new Promise(r => setTimeout(r, interval));
     }
     setTimeout(() => {
         diceContainer.classList.remove('rolling');
+        diceContainer.classList.add('bounce');
+        playSfx('diceLand');
         rollBtn.disabled = false;
-    }, 100);
+        setTimeout(() => diceContainer.classList.remove('bounce'), 600);
+    }, 120);
 }
 
 function addBounceToToken(playerIndex) {
@@ -84,6 +94,12 @@ function highlightCell(index) {
 
 function clearHighlight() {
     document.querySelectorAll('.cell-hit.highlight').forEach(c => c.classList.remove('highlight'));
+}
+
+function addEvent(msg) {
+    const input = document.getElementById('game-feed');
+    if (!input) return;
+    input.value = '› ' + msg;
 }
 
 function buildNameInputs() {
